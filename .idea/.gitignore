@@ -6,3 +6,9 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+# ignore all files of SQLite
+*.sqlite
+*.sqlite3
+*.db
+*.db3
