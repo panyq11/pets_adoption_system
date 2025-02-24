@@ -12,33 +12,3 @@
 *.sqlite3
 *.db
 *.db3
-
-# Ignore Python cache files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Ignore environment files
-.env
-.venv/
-venv/
-*.egg-info/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Ignore IDE/editor settings
-.idea/*
-!*.iml
-!.idea/workspace.xml
-!.idea/modules.xml
-!.idea/vcs.xml
-!.idea/runConfigurations/
-
-.vscode/
-*.sublime-project
-*.sublime-workspace
-
-# Ignore OS-generated files
-.DS_Store
-Thumbs.db
-desktop.ini
