@@ -16,10 +16,15 @@ class Pet(models.Model):
     status = models.CharField(max_length=20, choices=[('Available', 'Available'), ('Adopted', 'Adopted')], default='Available')
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE)  # 关联用户
     created_at = models.DateTimeField(auto_now_add=True)
-    type = models.CharField(max_length=50, choices=[('Dog', 'Dog'), ('Cat', 'Cat'), ('Other', 'Other')])
+    type = models.CharField(max_length=50, choices=[('Dog', 'Dog'), ('Cat', 'Cat')])
 
     def __str__(self):
-        return f"{self.name} ({self.breed})"
+        return f"{self.name} ({self.type})"
+
+class PetImage(models.Model):
+    pet_image_id = models.AutoField(primary_key=True)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name="images")
+    pet_image = models.ImageField(upload_to='pet_images/')
 
 
 class PostPetInfo(models.Model):
@@ -42,3 +47,14 @@ class PostPetInfo(models.Model):
 
     def __str__(self):
         return f"Post {self.post_info_id} - {self.pet.name} ({self.status})"
+
+class PostReview(models.Model):
+    post_id = models.AutoField(primary_key=True)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name="post_reviews")
+    operator_username = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_posts")
+    date = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
+
+    def __str__(self):
+        return f"Review for {self.pet.name} by {self.username.username} - {self.status}"
