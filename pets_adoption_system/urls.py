@@ -18,12 +18,13 @@ from django.urls import path, include
 from adoptions import views
 from django.conf import settings
 from django.conf.urls.static import static
+from posts import views as posts_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.available_pets, name='available_pets'),
     path('accounts/', include('accounts.urls')),
     path('posts/', include('posts.urls')),
-    path('adoptions', include('adoptions.urls')),
+    path('adoptions/', include('adoptions.urls')),
     path('admin-dashboard/', include('admin_dashboard.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    #用户在访问MEDIA_URL时，将MEDIA_ROOT指定的文件夹下面的图片返回给用户
