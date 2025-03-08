@@ -65,7 +65,7 @@ ROOT_URLCONF = 'pets_adoption_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,11 +131,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = 'static/'
-# 告诉 Django 额外的静态文件目录
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')   # 根目录下的 static/
-]
+STATICFILES_DIRS = [STATIC_DIR, ]
+MEDIA_ROOT = MEDIA_DIR
 
-MEDIA_ROOT = BASE_DIR / 'media' # 上传的媒体文件所在的路径
-MEDIA_URL = '/media/' # 通过该URL去访问
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
