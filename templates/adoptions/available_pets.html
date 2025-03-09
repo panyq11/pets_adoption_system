@@ -1,10 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Available-Pets</title>
-</head>
-<body>
-Your Furry Friends!
-</body>
-</html>
+{% extends 'adoptions/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+  <!-- 搜索和筛选区域 -->
+  <form method="get" action="{% url 'adoptions:available_pets' %}">
+  <div class="row mt-4">
+    <div class="col-md-4 mb-3">
+      <div class="input-group">
+        <!-- 搜索框：可在用户输入完成后自动提交 -->
+        <input type="text" name="q" class="form-control" placeholder="Search by breed..." onchange="this.form.submit()">
+        <!-- 如果需要按钮，可保留一个提交按钮，但不必强制点击 -->
+        <button class="btn btn-orange" type="submit">Search</button>
+      </div>
+    </div>
+    <div class="col-md-2 mb-3">
+      <select class="form-select" name="pet_type" onchange="this.form.submit()">
+          <option value="">All</option>
+          <option value="Cat">Cats</option>
+          <option value="Dog">Dogs</option>
+      </select>
+    </div>
+    <div class="col-md-2 mb-3">
+      <select class="form-select" name="age" onchange="this.form.submit()">
+        <option value="">Age</option>
+        <option value="young">Young</option>
+        <option value="adult">Adult</option>
+      </select>
+    </div>
+    <div class="col-md-2 mb-3">
+      <select class="form-select" name="sex" onchange="this.form.submit()">
+        <option value="">Sex</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
+    <div class="col-md-2 mb-3">
+      <select class="form-select" name="size" onchange="this.form.submit()">
+        <option value="">Size</option>
+        <option value="small">Small</option>
+        <option value="medium">Medium</option>
+        <option value="large">Large</option>
+      </select>
+    </div>
+  </div>
+</form>
+</div>
+
+  <!-- 宠物卡片列表 -->
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for pet in pets %}
+      <div class="col">
+        <div class="card">
+          {% comment %} 优先显示宠物的第一张图片 {% endcomment %}
+          {% with pet.images.all|first as first_image %}
+            {% if first_image %}
+              <img src="{{ first_image.pet_image.url }}" class="card-img-top" alt="{{ pet.name }}">
+            {% else %}
+              <img src="{% static 'images/default_pet.jpg' %}" class="card-img-top" alt="{{ pet.name }}">
+            {% endif %}
+          {% endwith %}
+          <div class="card-body">
+            <h5 class="card-title">{{ pet.name }}</h5>
+            <p class="card-text">
+              {% if pet.breed %}{{ pet.breed }}, {% endif %} {{ pet.sex }}, {{ pet.age }} years old
+            </p>
+            <a href="{% url 'adoptions:pet_detail' pet_id=pet.pet_id %}" class="btn btn-orange">View Details</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+</div>
+{% endblock %}

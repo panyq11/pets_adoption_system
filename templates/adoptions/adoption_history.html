@@ -1,10 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'adoptions/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Adoption History</h2>
+  <hr>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Adoption ID</th>
+        <th scope="col">Pet</th>
+        <th scope="col">Adopted Date</th>
+        <th scope="col">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 假设有历史记录 adoption_history -->
+      {% comment %}
+      {% for record in adoption_history %}
+        <tr>
+          <td>{{ record.adopt_info_id }}</td>
+          <td>{{ record.pet.name }}</td>
+          <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ record.get_status_display }}</td>
+        </tr>
+      {% endfor %}
+      {% endcomment %}
+
+      <!-- 示例静态数据 -->
+      <tr>
+        <td>1</td>
+        <td>Cindy</td>
+        <td>2025-03-07 15:20</td>
+        <td>Approved</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Luna</td>
+        <td>2025-02-15 11:00</td>
+        <td>Approved</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

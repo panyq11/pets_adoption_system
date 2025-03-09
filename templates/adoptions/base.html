@@ -1,10 +1,109 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Your Furry Friends</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <style>
+    /* 主色调橙色，可根据需要自行调整 */
+    :root {
+      --main-orange: #f39800;
+    }
+
+    /* 导航栏背景色 */
+    .navbar {
+      background-color: var(--main-orange);
+    }
+
+    /* 顶部橙色导航文字颜色为白色 */
+    .navbar .navbar-brand,
+    .navbar .nav-link {
+      color: #fff !important;
+    }
+
+    .navbar .nav-link:hover {
+      color: #f2f2f2 !important;
+    }
+
+    /* 橙色按钮，可根据需要扩展 */
+    .btn-orange {
+      background-color: var(--main-orange);
+      color: #fff;
+      border: none;
+    }
+
+    .btn-orange:hover {
+      background-color: #ff8c00; /* hover 时稍微加深 */
+      color: #fff;
+    }
+
+    /* 页脚示例样式 */
+    footer {
+      background-color: var(--main-orange);
+      color: #fff;
+      padding: 10px 0;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-$END$
+
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">Your Furry Friends</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon" style="color: #fff;"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <!-- 根据项目需要，自行添加链接 -->
+        <li class="nav-item">
+          <a class="nav-link" href="#">Posts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Adoptions</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">My Applications</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Adoption History</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- 主体内容 -->
+<main class="my-4">
+  {% block content %}
+  <!-- 子模板会在这里插入主要内容 -->
+  {% endblock %}
+</main>
+
+<!-- 底部 -->
+<footer>
+  <div class="container">
+    <p class="mb-0">© 2025 Your Furry Friends. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

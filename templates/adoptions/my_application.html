@@ -1,10 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'adoptions/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>My Applications</h2>
+  <hr>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Application ID</th>
+        <th scope="col">Pet</th>
+        <th scope="col">Submitted At</th>
+        <th scope="col">Status</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 假设有应用列表 my_applications -->
+      {% comment %}
+      {% for app in my_applications %}
+        <tr>
+          <td>{{ app.adopt_info_id }}</td>
+          <td>{{ app.pet.name }}</td>
+          <td>{{ app.created_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ app.get_status_display }}</td>
+          <td>
+            <a href="{% url 'adoption_approval_status' app.adopt_info_id %}" class="btn btn-orange btn-sm">View Status</a>
+          </td>
+        </tr>
+      {% endfor %}
+      {% endcomment %}
+
+      <!-- 示例静态数据 -->
+      <tr>
+        <td>1</td>
+        <td>Cindy</td>
+        <td>2025-03-01 10:30</td>
+        <td>Submitted</td>
+        <td><a href="#" class="btn btn-orange btn-sm">View Status</a></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>DianDian</td>
+        <td>2025-03-05 14:15</td>
+        <td>Processing</td>
+        <td><a href="#" class="btn btn-orange btn-sm">View Status</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
