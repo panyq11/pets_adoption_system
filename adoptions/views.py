@@ -1,11 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from posts.models import Pet, PetImage
+from accounts.models import User
 from .models import Pet, AdoptPetInfo
 from .forms import AdoptPetInfoForm
 
 # Create your views here.
 
 def available_pets(request):
+    #username = request.session.get('username', request.user.username)
+    #user = get_object_or_404(User, username=username)
+
     pets = Pet.objects.all()
 
     search_query = request.GET.get('q', '').strip()
