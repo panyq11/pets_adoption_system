@@ -12,3 +12,23 @@
 *.sqlite3
 *.db
 *.db3
+
+# 忽略 Python 解释文件
+*.pyc
+__pycache__/
+
+# 忽略环境变量文件
+.env
+
+# 忽略虚拟环境
+venv/
+*.venv/
+
+# 忽略 IDE 相关文件
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# 忽略迁移历史
+migrations/__pycache__/
