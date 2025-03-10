@@ -1,10 +1,701 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User management</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --primary-orange: #f9aa33;
+      --light-gray: #e0e0e0;
+      --text-dark: #333;
+      /* 低饱和度状态色 */
+      --status-approved: #d9ead3; /* 浅绿色 */
+      --status-pending: #fff2cc;  /* 浅黄色 */
+      --status-rejected: #f4cccc; /* 浅红色 */
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: var(--text-dark);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    /* 左侧导航栏 */
+    .sidebar {
+      width: 220px;
+      background-color: #fff;
+      border-right: 1px solid var(--light-gray);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar .logo {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: var(--primary-orange);
+      margin-bottom: 40px;
+    }
+    .sidebar .nav-item {
+      margin-bottom: 20px;
+    }
+    .sidebar .nav-item a {
+      text-decoration: none;
+      color: #555;
+      font-size: 1rem;
+      display: block;
+      padding: 8px 0;
+      transition: color 0.2s ease-in-out;
+    }
+    .sidebar .nav-item a.active {
+      color: var(--primary-orange);
+      font-weight: bold;
+    }
+    .sidebar .nav-item a:hover {
+      color: var(--primary-orange);
+    }
+    /* 顶部栏 */
+    .topbar {
+      margin-left: 220px;
+      height: 60px;
+      border-bottom: 1px solid var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .topbar .search-filter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar .search-filter input[type="text"] {
+      border: 1px solid var(--light-gray);
+      border-radius: 4px;
+      padding: 5px 10px;
+      outline: none;
+      width: 200px;
+    }
+    /* 管理员头像及下拉菜单 */
+    .admin-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .admin-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .admin-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 45px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      border: 1px solid var(--light-gray);
+      border-radius: 4px;
+      z-index: 100;
+    }
+    .admin-menu a {
+      display: block;
+      padding: 8px 12px;
+      text-decoration: none;
+      color: var(--text-dark);
+      transition: background-color 0.2s ease;
+    }
+    .admin-menu a:hover {
+      background-color: var(--light-gray);
+    }
+    /* 主内容区域 */
+    .main-content {
+      margin-left: 220px;
+      padding: 20px;
+    }
+    /* 滚动容器（横向和纵向滚动） */
+    .scroll-container {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: calc(100vh - 120px);
+    }
+    /* 表格样式 */
+    .table-custom {
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      width: 100%;
+      text-align: center;
+    }
+    .table-custom thead th {
+      background-color: var(--light-gray);
+      border: none;
+      font-weight: bold;
+      padding: 0.75rem;
+    }
+    .table-custom tbody tr {
+      background-color: #fff;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .table-custom tbody td {
+      border-top: none;
+      border-bottom: none;
+      padding: 0.75rem;
+      vertical-align: middle;
+    }
+    /* 状态下拉菜单 */
+    .status-select {
+      border: 1px solid var(--light-gray);
+      border-radius: 4px;
+      padding: 2px 4px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background-color: #fff;
+    }
+    /* 头像和宠物图片 */
+    .avatar, .pet-image {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 8px;
+    }
+    /* 隐藏 */
+    .hidden {
+      display: none;
+    }
+    /* Pets 子导航 */
+    .pet-sub-nav {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .pet-sub-nav a {
+      text-decoration: none;
+      color: #555;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 4px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .pet-sub-nav a.active {
+      color: var(--primary-orange);
+      border-bottom: 2px solid var(--primary-orange);
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-admin-dashboard is working...
+  <!-- 左侧导航栏 -->
+  <div class="sidebar">
+    <div class="logo">Your Furry Friends</div>
+    <div class="nav-item">
+      <a href="#" id="nav-users" class="active">Users</a>
+    </div>
+    <div class="nav-item">
+      <a href="#" id="nav-pets">Pets</a>
+    </div>
+    <div class="nav-item">
+      <a href="#" id="nav-adoption">Adoption Review</a>
+    </div>
+    <div class="nav-item">
+      <a href="#" id="nav-postreview">Post Review</a>
+    </div>
+  </div>
+
+  <!-- 顶部栏 -->
+  <div class="topbar">
+    <div class="search-filter">
+      <input type="text" id="searchInput" placeholder="Search for user or pet...">
+    </div>
+    <div class="admin-dropdown">
+      <img src="https://via.placeholder.com/40?text=Admin" alt="Admin" class="admin-avatar" id="adminAvatar">
+      <div class="admin-menu" id="adminMenu">
+        <a href="/login">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主内容区域 -->
+  <div class="main-content">
+    <!-- Users 区域 -->
+    <div id="users-section">
+      <h4>Users List</h4>
+      <div class="scroll-container">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User Image</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Phone Number</th>
+              <th>Address</th>
+              <th>Birthday</th>
+              <th>Created Time</th>
+              <th>Updated Time</th>
+              <th>User Status</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <!-- 示例数据，后端可动态生成 -->
+            <tr>
+              <td>1</td>
+              <td><img src="https://via.placeholder.com/40" alt="User" class="avatar"></td>
+              <td>JohnDoe</td>
+              <td>john@example.com</td>
+              <td>+1 234-567-890</td>
+              <td>123 Main St, City</td>
+              <td>1990-05-15</td>
+              <td>2023-01-01 10:00</td>
+              <td>2023-02-01 14:30</td>
+              <td>
+                <select class="status-select">
+                  <option value="Active" selected>Active</option>
+                  <option value="Banned">Banned</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pets 区域 -->
+    <div id="pets-section" class="hidden">
+      <h4>Pets</h4>
+      <!-- Pets 子导航 -->
+      <div class="pet-sub-nav">
+        <a href="#" id="pet-cat" class="active">Cat</a>
+        <a href="#" id="pet-dog">Dog</a>
+        <a href="#" id="pet-addnew">Add New</a>
+      </div>
+      <!-- Cat 列表 -->
+      <div id="cat-section">
+        <div class="scroll-container">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Pet Image</th>
+                <th>Name</th>
+                <th>Sex</th>
+                <th>Breed</th>
+                <th>Age</th>
+                <th>Weight</th>
+                <th>Size</th>
+                <th>Pet Passport</th>
+                <th>Vaccinated</th>
+                <th>Pet Status</th>
+                <th>Created Time</th>
+              </tr>
+            </thead>
+            <tbody id="cat-tbody">
+              <tr>
+                <td>1</td>
+                <td><img src="https://via.placeholder.com/40" alt="Pet" class="pet-image"></td>
+                <td>Cindy</td>
+                <td>Female</td>
+                <td>Blue Golden Shaded</td>
+                <td>2y</td>
+                <td>700g</td>
+                <td>Small</td>
+                <td>C123456</td>
+                <td>Yes</td>
+                <td>
+                  <select class="status-select">
+                    <option value="Available" selected>Available</option>
+                    <option value="Adopted">Adopted</option>
+                  </select>
+                </td>
+                <td>2025-03-01 09:15</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Dog 列表 -->
+      <div id="dog-section" class="hidden">
+        <div class="scroll-container">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Pet Image</th>
+                <th>Name</th>
+                <th>Sex</th>
+                <th>Breed</th>
+                <th>Age</th>
+                <th>Weight</th>
+                <th>Size</th>
+                <th>Pet Passport</th>
+                <th>Vaccinated</th>
+                <th>Pet Status</th>
+                <th>Created Time</th>
+              </tr>
+            </thead>
+            <tbody id="dog-tbody">
+              <tr>
+                <td>1</td>
+                <td><img src="https://via.placeholder.com/40" alt="Pet" class="pet-image"></td>
+                <td>Luna</td>
+                <td>Female</td>
+                <td>Husky</td>
+                <td>1y</td>
+                <td>10kg</td>
+                <td>Medium</td>
+                <td>D100001</td>
+                <td>No</td>
+                <td>
+                  <select class="status-select">
+                    <option value="Available" selected>Available</option>
+                    <option value="Adopted">Adopted</option>
+                  </select>
+                </td>
+                <td>2025-03-02 16:45</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Add New -->
+      <div id="addnew-section" class="hidden">
+        <h5>Add New Pet</h5>
+        <p>Here is a form to add new pets...</p>
+      </div>
+    </div>
+
+    <!-- Adoption Review 区域 -->
+    <div id="adoption-section" class="hidden">
+      <h4>Adoption Review</h4>
+      <div class="scroll-container">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User Image</th>
+              <th>Username</th>
+              <th>Pet Name</th>
+              <th>Home Type</th>
+              <th>Home Ownership</th>
+              <th>Children</th>
+              <th>Experience</th>
+              <th>Reason</th>
+              <th>Vaccinated</th>
+              <th>Pet Passport</th>
+              <th>Operator</th>
+              <th>Submission Time</th>
+              <th>Review Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="adoption-tbody">
+            <tr>
+              <td>1</td>
+              <td><img src="https://via.placeholder.com/40" alt="User" class="avatar"></td>
+              <td>Bob</td>
+              <td>Luna</td>
+              <td>House</td>
+              <td>Own</td>
+              <td>2</td>
+              <td>No</td>
+              <td>Companionship</td>
+              <td>No</td>
+              <td>D100001</td>
+              <td>OperatorB</td>
+              <td>2025-03-05 09:00</td>
+              <td>2025-03-06 16:30</td>
+              <td>
+                <select class="status-select">
+                  <option value="Pending" selected>Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Post Review 区域（补全版） -->
+    <div id="postreview-section" class="hidden">
+      <h4>Post Review</h4>
+      <div class="scroll-container">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Pet Image</th>
+              <th>Pet Name</th>
+              <th>Sex</th>
+              <th>Breed</th>
+              <th>Age</th>
+              <th>Weight</th>
+              <th>Size</th>
+              <th>Pet Passport</th>
+              <th>Vaccinated</th>
+              <th>Submission Time</th>
+              <th>Review Time</th>
+              <th>Operator</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="postreview-tbody">
+            <tr>
+              <td>1</td>
+              <td><img src="https://via.placeholder.com/40" alt="Pet" class="pet-image"></td>
+              <td>Max</td>
+              <td>Male</td>
+              <td>German Shepherd</td>
+              <td>3y</td>
+              <td>20kg</td>
+              <td>Large</td>
+              <td>P987654</td>
+              <td>Yes</td>
+              <td>2025-03-02 10:00</td>
+              <td>2025-03-03 15:00</td>
+              <td>OperatorC</td>
+              <td>
+                <select class="status-select">
+                  <option value="Pending" selected>Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // 主导航切换：Users, Pets, Adoption Review, Post Review
+    const navUsers = document.getElementById("nav-users");
+    const navPets = document.getElementById("nav-pets");
+    const navAdoption = document.getElementById("nav-adoption");
+    const navPostReview = document.getElementById("nav-postreview");
+
+    const usersSection = document.getElementById("users-section");
+    const petsSection = document.getElementById("pets-section");
+    const adoptionSection = document.getElementById("adoption-section");
+    const postreviewSection = document.getElementById("postreview-section");
+
+    function hideAllMainSections() {
+      usersSection.classList.add("hidden");
+      petsSection.classList.add("hidden");
+      adoptionSection.classList.add("hidden");
+      postreviewSection.classList.add("hidden");
+    }
+    function removeActiveFromNav() {
+      navUsers.classList.remove("active");
+      navPets.classList.remove("active");
+      navAdoption.classList.remove("active");
+      navPostReview.classList.remove("active");
+    }
+    navUsers.addEventListener("click", e => {
+      e.preventDefault();
+      removeActiveFromNav();
+      navUsers.classList.add("active");
+      hideAllMainSections();
+      usersSection.classList.remove("hidden");
+    });
+    navPets.addEventListener("click", e => {
+      e.preventDefault();
+      removeActiveFromNav();
+      navPets.classList.add("active");
+      hideAllMainSections();
+      petsSection.classList.remove("hidden");
+    });
+    navAdoption.addEventListener("click", e => {
+      e.preventDefault();
+      removeActiveFromNav();
+      navAdoption.classList.add("active");
+      hideAllMainSections();
+      adoptionSection.classList.remove("hidden");
+    });
+    navPostReview.addEventListener("click", e => {
+      e.preventDefault();
+      removeActiveFromNav();
+      navPostReview.classList.add("active");
+      hideAllMainSections();
+      postreviewSection.classList.remove("hidden");
+    });
+
+    // Pets 子导航切换：Cat, Dog, Add New
+    const petCat = document.getElementById("pet-cat");
+    const petDog = document.getElementById("pet-dog");
+    const petAddnew = document.getElementById("pet-addnew");
+
+    const catSection = document.getElementById("cat-section");
+    const dogSection = document.getElementById("dog-section");
+    const addnewSection = document.getElementById("addnew-section");
+
+    function hideAllPetSubSections() {
+      catSection.classList.add("hidden");
+      dogSection.classList.add("hidden");
+      addnewSection.classList.add("hidden");
+    }
+    function removeActiveFromPetSubNav() {
+      petCat.classList.remove("active");
+      petDog.classList.remove("active");
+      petAddnew.classList.remove("active");
+    }
+    petCat.addEventListener("click", e => {
+      e.preventDefault();
+      removeActiveFromPetSubNav();
+      petCat.classList.add("active");
+      hideAllPetSubSections();
+      catSection.classList.remove("hidden");
+    });
+    petDog.addEventListener("click", e => {
+      e.preventDefault();
+      removeActiveFromPetSubNav();
+      petDog.classList.add("active");
+      hideAllPetSubSections();
+      dogSection.classList.remove("hidden");
+    });
+    petAddnew.addEventListener("click", e => {
+      e.preventDefault();
+      removeActiveFromPetSubNav();
+      petAddnew.classList.add("active");
+      hideAllPetSubSections();
+      addnewSection.classList.remove("hidden");
+    });
+
+    // 管理员头像下拉菜单
+    const adminAvatar = document.getElementById("adminAvatar");
+    const adminMenu = document.getElementById("adminMenu");
+    adminAvatar.addEventListener("click", (e) => {
+      e.stopPropagation();
+      adminMenu.style.display = adminMenu.style.display === "block" ? "none" : "block";
+    });
+    document.addEventListener("click", () => {
+      adminMenu.style.display = "none";
+    });
+
+    // 搜索示例
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", () => {
+      const keyword = searchInput.value.toLowerCase();
+      console.log("Searching for:", keyword);
+      // 此处可根据 keyword 过滤各区域数据
+    });
+  </script>
+  <!--
+    测试案例（静态）：可解除注释后自动生成示例数据
+    实际项目中请由后端传递数据
+  -->
+  <!--
+  <script>
+    // 示例数据：Users
+    const usersData = [
+      {
+        user_image: "https://via.placeholder.com/40",
+        username: "Alice",
+        email: "alice@example.com",
+        phone: "+1 987-654-321",
+        address: "456 River Rd, City",
+        birthday: "1992-08-10",
+        created_time: "2023-02-01 12:00",
+        updated_time: "2023-03-05 09:15",
+        status: "Active"
+      },
+      {
+        user_image: "https://via.placeholder.com/40",
+        username: "Bob",
+        email: "bob@example.com",
+        phone: "+1 111-222-333",
+        address: "789 Hill St, City",
+        birthday: "1985-12-25",
+        created_time: "2022-12-01 10:00",
+        updated_time: "2023-02-15 08:30",
+        status: "Banned"
+      }
+    ];
+    const usersTbody = document.getElementById("users-tbody");
+    usersTbody.innerHTML = "";
+    usersData.forEach((user, i) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td><img src="${user.user_image}" alt="User" class="avatar"></td>
+        <td>${user.username}</td>
+        <td>${user.email}</td>
+        <td>${user.phone}</td>
+        <td>${user.address}</td>
+        <td>${user.birthday}</td>
+        <td>${user.created_time}</td>
+        <td>${user.updated_time}</td>
+        <td>
+          <select class="status-select">
+            <option value="Active" ${user.status === "Active" ? "selected" : ""}>Active</option>
+            <option value="Banned" ${user.status === "Banned" ? "selected" : ""}>Banned</option>
+          </select>
+        </td>
+      `;
+      usersTbody.appendChild(row);
+    });
+
+    // 示例数据：Post Review（补全版）
+    const postReviewData = [
+      {
+        pet_image: "https://via.placeholder.com/40",
+        pet_name: "Max",
+        sex: "Male",
+        breed: "German Shepherd",
+        age: "3y",
+        weight: "20kg",
+        size: "Large",
+        pet_passport: "P987654",
+        vaccinated: "Yes",
+        submission_time: "2025-03-02 10:00",
+        review_time: "2025-03-03 15:00",
+        operator: "OperatorC",
+        status: "Rejected"
+      }
+    ];
+    const postReviewTbody = document.getElementById("postreview-tbody");
+    postReviewTbody.innerHTML = "";
+    postReviewData.forEach((post, i) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td><img src="${post.pet_image}" alt="Pet" class="pet-image"></td>
+        <td>${post.pet_name}</td>
+        <td>${post.sex}</td>
+        <td>${post.breed}</td>
+        <td>${post.age}</td>
+        <td>${post.weight}</td>
+        <td>${post.size}</td>
+        <td>${post.pet_passport}</td>
+        <td>${post.vaccinated}</td>
+        <td>${post.submission_time}</td>
+        <td>${post.review_time}</td>
+        <td>${post.operator}</td>
+        <td>
+          <select class="status-select">
+            <option value="Pending" ${post.status === "Pending" ? "selected" : ""}>Pending</option>
+            <option value="Approved" ${post.status === "Approved" ? "selected" : ""}>Approved</option>
+            <option value="Rejected" ${post.status === "Rejected" ? "selected" : ""}>Rejected</option>
+          </select>
+        </td>
+      `;
+      postReviewTbody.appendChild(row);
+    });
+  </script>
+  -->
 </body>
 </html>

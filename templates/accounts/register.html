@@ -2,90 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Log In | Your Furry Friends</title>
+  <title>Sign Up | Your Furry Friends</title>
   <link rel="stylesheet" href="{% static 'bootstrap5/css/bootstrap.min.css' %}">
   <script src="{% static 'bootstrap5/js/bootstrap.bundle.js' %}"></script>
   <style>
     :root {
-      --main-color: #D4904B; /* 你的橙色 */
-      --hover-color: #BF732A; /* 悬停时更深的橙色 */
+      --main-color: #D4904B; /* 主题橙色 */
+      --hover-color: #BF732A; /* 悬停时的深橙色 */
     }
-
     body {
+      background-color: #ffffff; /* 白色背景 */
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #ffffff; /* 白色背景 */
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh; /* 垂直居中 */
-      font-family: Arial, sans-serif;
-      color: #333;
+      min-height: 100vh;
       position: relative;
+      color: #333;
     }
-
-    /* 页眉：Logo 放在左上角 */
+    /* 左上角Logo */
     .header {
       position: absolute;
       top: 20px;
       left: 20px;
     }
     .header img {
-      max-width: 150px; /* 合适的Logo大小 */
+      max-width: 150px;
+      height: auto;
     }
-
-    .login-wrapper {
-      width: 500px; /* 放大整体尺寸 */
+    /* 注册容器 */
+    .register-wrapper {
+      width: 500px;
       max-width: 90%;
+      margin: auto;
       text-align: center;
     }
-
-    /* 标题 */
-    .login-title {
+    .register-title {
       font-size: 36px;
       font-weight: bold;
-      margin-bottom: 30px;
-    }
-
-    /* 输入区域 */
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 30px; /* 调大间距，让按钮与上方输入框更分明 */
       margin-bottom: 20px;
     }
-
-    .form-group {
-      text-align: left; /* 标签左对齐 */
+    .register-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 20px;
     }
-
+    .form-group {
+      text-align: left;
+    }
     .form-label {
       font-weight: 600;
       margin-bottom: 6px;
       color: #555;
     }
-
-    /* 输入框：窄边矩形 */
+    /* 输入框采用简约风格：细边框矩形 */
     .form-control {
-      border: 1px solid #ccc; /* 窄边框 */
+      border: 1px solid #ccc;
       border-radius: 6px;
       padding: 12px;
       font-size: 16px;
       box-shadow: none;
     }
-
     .form-control:focus {
       outline: none;
       border-color: var(--main-color);
     }
-
-    /* placeholder 颜色更浅 */
+    /* placeholder颜色较浅 */
     .form-control::placeholder {
       color: rgba(0, 0, 0, 0.3);
     }
-
-    /* 按钮 */
-    .btn-login {
+    /* 注册按钮 */
+    .btn-register {
       background-color: var(--main-color);
       color: #fff;
       border: none;
@@ -94,55 +84,61 @@
       border-radius: 6px;
       cursor: pointer;
       transition: background 0.3s;
-      margin-top: 40px; /* 增加 Next 按钮与上方的额外间距 */
+      margin-top: 40px; /* 增加按钮与上方内容间距 */
     }
-
-    .btn-login:hover {
+    .btn-register:hover {
       background-color: var(--hover-color);
     }
-
-    /* 底部链接（注册） */
-    .signup-text {
+    /* 底部登录链接 */
+    .login-link {
       margin-top: 20px;
       font-size: 15px;
       color: #666;
     }
-
-    .signup-text a {
+    .login-link a {
       color: var(--main-color);
       text-decoration: none;
       font-weight: bold;
     }
-
-    .signup-text a:hover {
+    .login-link a:hover {
       text-decoration: underline;
+      color: var(--hover-color);
     }
-
   </style>
 </head>
 <body>
 
 
-<div class="login-wrapper">
-  <!-- 标题 -->
-  <h1 class="login-title">Log In</h1>
 
-  <!-- 输入区域 -->
-  <form class="login-form">
+<div class="register-wrapper">
+  <h1 class="register-title">Sign Up</h1>
+  <p class="text-muted">Join the Your Furry Friends community today.</p>
+
+  <!-- 注册表单 -->
+  <form class="register-form" method="post">
+    {% csrf_token %}
+    <!-- 用户名 -->
     <div class="form-group">
       <label class="form-label">Username</label>
-      <input type="username" class="form-control" required title="Please fill out this field" placeholder="Username" autocomplete="off" required>
+      <input type="text" class="form-control" required title="Please fill out this field" placeholder="Enter your username" name="username" required>
     </div>
 
+    <!-- 密码 -->
     <div class="form-group">
       <label class="form-label">Password</label>
-      <input type="password" class="form-control" required title="Please fill out this field" placeholder="Password" autocomplete="new-password" required>
+      <input type="password" class="form-control" required title="Please fill out this field" placeholder="Enter your password" name="password1" required>
     </div>
 
-    <button type="submit" class="btn-login">Next</button>
+    <!-- 确认密码 -->
+    <div class="form-group">
+      <label class="form-label">Confirm Password</label>
+      <input type="password" class="form-control" required title="Please fill out this field" placeholder="Confirm your password" name="password2" required>
+    </div>
+
+    <button type="submit" class="btn-register">Sign Up</button>
   </form>
 
-    <script>
+        <script>
     document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("input[required]").forEach(input => {
         input.addEventListener("invalid", function (event) {
@@ -155,15 +151,11 @@
 });
 </script>
 
-
-  <!-- 底部“Don't have an account? Sign up.” -->
-  <p class="signup-text">
-    Don't have an account? <a href="{% url 'accounts:register' %}">Sign up.</a>
+  <!-- 底部登录链接 -->
+  <p class="login-link">
+    Already have an account? <a href="{% url 'accounts:login' %}">Sign In</a>
   </p>
 </div>
-
-
-
 
 </body>
 </html>

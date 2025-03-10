@@ -22,7 +22,7 @@ from posts import views as posts_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls', namespace='accounts')),
     path('posts/', include('posts.urls')),
     path('adoptions/', include('adoptions.urls')),
     path('admin-dashboard/', include('admin_dashboard.urls'))
