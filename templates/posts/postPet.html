@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Post Pet</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* 自定义配色 */
+    :root {
+      --primary-orange: #F9AA33;
+      --light-gray: #e0e0e0;
+      --step-inactive: #bfbfbf;
+      --text-dark: #333;
+    }
+    body {
+      background-color: #fff;
+      color: var(--text-dark);
+    }
+    /* 顶部导航栏 */
+    .navbar-custom {
+      background-color: #fff;
+      border-bottom: 1px solid var(--light-gray);
+    }
+    .navbar-brand,
+    .navbar-brand:link,
+    .navbar-brand:visited {
+      color: var(--primary-orange) !important;
+      text-decoration: none;
+      transition: color 0.2s ease-in-out;
+    }
+    .navbar-brand:hover,
+    .navbar-brand:focus,
+    .navbar-brand:active {
+      color: #ccc !important;
+      text-decoration: none;
+    }
+    .navbar-nav .nav-link {
+      color: #555 !important;
+      margin-left: 1rem;
+      transition: color 0.2s ease-in-out;
+    }
+    .navbar-nav .nav-link:hover {
+      color: var(--primary-orange) !important;
+    }
+    .navbar-nav .nav-link.active {
+      color: var(--primary-orange) !important;
+    }
+    /* 步骤指示器 */
+    .step-indicator {
+      border-bottom: 1px solid var(--light-gray);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .step-indicator .nav-link {
+      color: var(--step-inactive);
+      font-weight: 500;
+      margin: 0 1rem;
+    }
+    .step-indicator .nav-link.active {
+      color: var(--primary-orange);
+      cursor: default;
+    }
+    /* 表单区域 */
+    .form-section {
+      display: none;
+    }
+    .form-section.active {
+      display: block;
+    }
+    /* 底部按钮 */
+    .bottom-buttons {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .btn-next {
+      background-color: var(--primary-orange);
+      color: #fff;
+      border: none;
+      transition: background-color 0.2s ease-in-out;
+    }
+    .btn-next:hover {
+      background-color: #e2982c;
+    }
+    .btn-prev {
+      background-color: var(--light-gray);
+      color: #333;
+      border: none;
+      transition: background-color 0.2s ease-in-out;
+    }
+    .btn-prev:hover {
+      background-color: #ccc;
+    }
+    .btn-submit {
+      background-color: var(--primary-orange);
+      color: #fff;
+      border: none;
+      transition: background-color 0.2s ease-in-out;
+    }
+    .btn-submit:hover {
+      background-color: #e2982c;
+    }
+    /* 图片预览样式 */
+    #preview-container .img-wrapper {
+      position: relative;
+      margin: 0.5rem;
+    }
+    #preview-container img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    #preview-container .delete-btn {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #dc3545;
+      border: none;
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 14px;
+      line-height: 18px;
+      text-align: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航栏 -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+      <!-- 点击后跳转到主页 -->
+      <a class="navbar-brand" href="/">Your Furry Friends</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <!-- 添加 Post Pet 菜单项，并设置 active -->
+          <li class="nav-item">
+            <a class="nav-link active" href="/posts/">Post Pet</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/posts/my_posts/">My Posts</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/posts/review_status/">Post Review</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 步骤指示器 -->
+  <div class="container step-indicator">
+    <ul class="nav justify-content-center">
+      <li class="nav-item">
+        <a class="nav-link active" id="step1Link" aria-current="page">1. Pet Information</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="step2Link">2. Foster Information</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="container mb-5">
+    <form id="petForm">
+      <!-- 第1页：宠物信息填写 -->
+      <div id="page1" class="form-section active">
+        <div class="mb-3">
+          <label for="petName" class="form-label">Pet Name</label>
+          <input type="text" class="form-control" id="petName" name="petName" placeholder="Enter pet name">
+        </div>
+        <div class="mb-3">
+          <label for="petPhotos" class="form-label">Pet Photos (max 6 images)</label>
+          <input type="file" class="form-control" id="petPhotos" name="petPhotos" accept="image/*" multiple>
+          <div id="preview-container" class="mt-3 d-flex flex-wrap"></div>
+        </div>
+        <div class="mb-3">
+          <label for="petGender" class="form-label">Pet Gender</label>
+          <select class="form-select" id="petGender" name="petGender">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="petBreed" class="form-label">Breed</label>
+          <input type="text" class="form-control" id="petBreed" name="petBreed" placeholder="Enter pet breed">
+        </div>
+        <div class="mb-3">
+          <label for="petAge" class="form-label">Age</label>
+          <input type="number" class="form-control" id="petAge" name="petAge" min="0" placeholder="e.g., 2">
+        </div>
+        <div class="mb-3">
+          <label for="petWeight" class="form-label">Weight (kg)</label>
+          <input type="number" class="form-control" id="petWeight" name="petWeight" min="0" step="0.1" placeholder="e.g., 5.5">
+        </div>
+        <div class="mb-3">
+          <label for="petSize" class="form-label">Size</label>
+          <select class="form-select" id="petSize" name="petSize">
+            <option value="">Select Size</option>
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="petPassport" class="form-label">Pet Passport</label>
+          <input type="text" class="form-control" id="petPassport" name="petPassport" placeholder="Enter pet passport info">
+        </div>
+        <div class="mb-3">
+          <label for="vaccineStatus" class="form-label">Vaccinated</label>
+          <select class="form-select" id="vaccineStatus" name="vaccineStatus">
+            <option value="">Select Option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 第2页：寄养人信息填写 -->
+      <div id="page2" class="form-section">
+        <div class="mb-3">
+          <label for="userEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter your email" required>
+        </div>
+        <div class="mb-3">
+          <label for="homeType" class="form-label">Home Type</label>
+          <select class="form-select" id="homeType" name="homeType">
+            <option value="">Select Home Type</option>
+            <option value="apartment">Apartment</option>
+            <option value="house">House</option>
+            <option value="townhouse">Townhouse</option>
+            <option value="rural">Farm/Rural</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="homeOwnership" class="form-label">Home Ownership</label>
+          <select class="form-select" id="homeOwnership" name="homeOwnership">
+            <option value="">Select Ownership</option>
+            <option value="own">Own</option>
+            <option value="rent">Rent</option>
+            <option value="withParents">Living with Parents</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="otherPets" class="form-label">Other Pets</label>
+          <input type="text" class="form-control" id="otherPets" name="otherPets" placeholder="Describe other pets (quantity and breed)">
+        </div>
+        <div class="mb-3">
+          <label for="childrenCount" class="form-label">Number of Children</label>
+          <select class="form-select" id="childrenCount" name="childrenCount">
+            <option value="">Select Number</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="experience" class="form-label">Pet Experience</label>
+          <textarea class="form-control" id="experience" name="experience" rows="4" placeholder="Describe your pet care experience"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="reason" class="form-label">Fostering Reason</label>
+          <textarea class="form-control" id="reason" name="reason" rows="4" placeholder="Explain your reason for fostering"></textarea>
+        </div>
+      </div>
+
+      <!-- 底部按钮 -->
+      <div class="bottom-buttons">
+        <button type="button" id="prevBtn" class="btn btn-prev" onclick="prevPage()">Previous</button>
+        <button type="button" id="nextBtn" class="btn btn-next" onclick="nextPage()">Next</button>
+        <button type="submit" id="submitBtn" class="btn btn-submit">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let currentPage = 1;
+    const totalPages = 2;
+    const page1 = document.getElementById('page1');
+    const page2 = document.getElementById('page2');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const step1Link = document.getElementById('step1Link');
+    const step2Link = document.getElementById('step2Link');
+
+    function showPage(page) {
+      // 隐藏所有表单页
+      page1.classList.remove('active');
+      page2.classList.remove('active');
+      // 显示当前页
+      if (page === 1) {
+        page1.classList.add('active');
+      } else {
+        page2.classList.add('active');
+      }
+      // 控制按钮显示
+      if (page === 1) {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'inline-block';
+        submitBtn.style.display = 'none';
+      } else {
+        prevBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'inline-block';
+      }
+      // 更新步骤指示器
+      if (page === 1) {
+        step1Link.classList.add('active');
+        step2Link.classList.remove('active');
+      } else {
+        step1Link.classList.remove('active');
+        step2Link.classList.add('active');
+      }
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages) {
+        currentPage++;
+        showPage(currentPage);
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        showPage(currentPage);
+      }
+    }
+
+    // 初始化
+    showPage(currentPage);
+
+    // 图片上传及预览逻辑——累计添加
+    let selectedFiles = [];
+    const petPhotosInput = document.getElementById('petPhotos');
+    const previewContainer = document.getElementById('preview-container');
+
+    petPhotosInput.addEventListener('change', function(event) {
+      const newFiles = Array.from(event.target.files);
+      if (selectedFiles.length + newFiles.length > 6) {
+        alert("You can upload a maximum of 6 images.");
+        petPhotosInput.value = "";
+        return;
+      }
+      selectedFiles = selectedFiles.concat(newFiles);
+      updatePreview();
+      petPhotosInput.value = ""; // 重置选择
+    });
+
+    function updatePreview() {
+      previewContainer.innerHTML = "";
+      selectedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const wrapper = document.createElement("div");
+          wrapper.classList.add("img-wrapper");
+          wrapper.dataset.index = index;
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          const deleteBtn = document.createElement("button");
+          deleteBtn.innerHTML = "&times;";
+          deleteBtn.classList.add("delete-btn");
+          deleteBtn.addEventListener("click", function() {
+            selectedFiles.splice(index, 1);
+            updatePreview();
+          });
+          wrapper.appendChild(img);
+          wrapper.appendChild(deleteBtn);
+          previewContainer.appendChild(wrapper);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  </script>
+</body>
+</html>

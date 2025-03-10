@@ -1,15 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
+  <meta charset="UTF-8">
+  <title>Log In | Your Furry Friends</title>
+  <link rel="stylesheet" href="{% static 'bootstrap5/css/bootstrap.min.css' %}">
+  <script src="{% static 'bootstrap5/js/bootstrap.bundle.js' %}"></script>
+  <style>
+    :root {
+      --main-color: #D4904B; /* 你的橙色 */
+      --hover-color: #BF732A; /* 悬停时更深的橙色 */
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff; /* 白色背景 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh; /* 垂直居中 */
+      font-family: Arial, sans-serif;
+      color: #333;
+      position: relative;
+    }
+
+    /* 页眉：Logo 放在左上角 */
+    .header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+    .header img {
+      max-width: 150px; /* 合适的Logo大小 */
+    }
+
+    .login-wrapper {
+      width: 500px; /* 放大整体尺寸 */
+      max-width: 90%;
+      text-align: center;
+    }
+
+    /* 标题 */
+    .login-title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    /* 输入区域 */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 30px; /* 调大间距，让按钮与上方输入框更分明 */
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      text-align: left; /* 标签左对齐 */
+    }
+
+    .form-label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #555;
+    }
+
+    /* 输入框：窄边矩形 */
+    .form-control {
+      border: 1px solid #ccc; /* 窄边框 */
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 16px;
+      box-shadow: none;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--main-color);
+    }
+
+    /* placeholder 颜色更浅 */
+    .form-control::placeholder {
+      color: rgba(0, 0, 0, 0.3);
+    }
+
+    /* 按钮 */
+    .btn-login {
+      background-color: var(--main-color);
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 40px; /* 增加 Next 按钮与上方的额外间距 */
+    }
+
+    .btn-login:hover {
+      background-color: var(--hover-color);
+    }
+
+    /* 底部链接（注册） */
+    .signup-text {
+      margin-top: 20px;
+      font-size: 15px;
+      color: #666;
+    }
+
+    .signup-text a {
+      color: var(--main-color);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .signup-text a:hover {
+      text-decoration: underline;
+    }
+
+  </style>
 </head>
 <body>
-<h1>User Login</h1>
-<form method="post" action="login/">
-    <input type="text" name="user" placeholder="Username">
-    <input type="password" name="user" placeholder="Password">
-    <input type="submit" value="submit">
-</form>
+
+
+<div class="login-wrapper">
+  <!-- 标题 -->
+  <h1 class="login-title">Log In</h1>
+
+  <!-- 输入区域 -->
+  <form class="login-form">
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input type="username" class="form-control" required title="Please fill out this field" placeholder="Username" autocomplete="off" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-control" required title="Please fill out this field" placeholder="Password" autocomplete="new-password" required>
+    </div>
+
+    <button type="submit" class="btn-login">Next</button>
+  </form>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("input[required]").forEach(input => {
+        input.addEventListener("invalid", function (event) {
+            input.setCustomValidity("Please fill out this field."); // 自定义提示
+        });
+        input.addEventListener("input", function () {
+            input.setCustomValidity(""); // 用户输入时清除错误信息
+        });
+    });
+});
+</script>
+
+
+  <!-- 底部“Don't have an account? Sign up.” -->
+  <p class="signup-text">
+    Don't have an account? <a href="{% url 'accounts:register' %}">Sign up.</a>
+  </p>
+</div>
+
+
+
+
 </body>
 </html>
