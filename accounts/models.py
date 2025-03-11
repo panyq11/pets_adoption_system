@@ -9,7 +9,7 @@ class User(AbstractUser):
     """
     自定义用户模型，扩展 Django 的 AbstractUser
     """
-    email = models.EmailField(unique=True)  # 设置 email 唯一
+    email = models.EmailField(unique=False, blank=True, null=True) # 改为了false（允许了多个用户注册）
     username = models.CharField(max_length=50, unique=True)  # 自定义用户名长度
     phone_no = models.CharField(max_length=15, unique=True, null=True, blank=True)
     address = models.TextField(null=True, blank=True)

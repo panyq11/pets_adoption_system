@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
 from posts.models import Pet, PetImage
 from accounts.models import User
 from .models import Pet, AdoptPetInfo
@@ -6,9 +8,10 @@ from .forms import AdoptPetInfoForm
 
 # Create your views here.
 
+#@login_required
 def available_pets(request):
-    #username = request.session.get('username', request.user.username)
-    #user = get_object_or_404(User, username=username)
+    username = request.session.get('username', request.user.username)
+    user = get_object_or_404(User, username=username)
 
     pets = Pet.objects.all()
 

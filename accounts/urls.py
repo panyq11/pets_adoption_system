@@ -1,8 +1,16 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from accounts import views
 
-app_name = 'accounts'
+app_name = 'accounts'  # 定义当前应用名称，方便在模板中使用 URL 反向解析
 
 urlpatterns = [
-    path('', views.login, name='login'),
+    # 登录页面,
+    path('', views.accounts, name='login'),
+
+    # 注册页面，由自定义的 register 视图处理
+    path('register/', views.register, name='register'),
+
+    path('profile/', views.profile, name='profile')
+
 ]
