@@ -7,4 +7,7 @@ class PetForm(forms.ModelForm):
         fields = ['name', 'sex', 'age', 'weight', 'breed', 'size']
 
 class PetImageForm(forms.Form):
-    pet_images = forms.FileField(required=False)# 允许多张图片上传
+    pet_images = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'multiple': True}),
+        required=False
+    )

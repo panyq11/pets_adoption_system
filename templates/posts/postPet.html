@@ -136,7 +136,7 @@
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
       <!-- 点击后跳转到主页 -->
-      <a class="navbar-brand" href="/">Your Furry Friends</a>
+      <a class="navbar-brand" href="/adoptions/">Your Furry Friends</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -172,7 +172,8 @@
 
   <!-- 主内容 -->
   <div class="container mb-5">
-    <form id="petForm">
+    <form id="petForm" method="POST" action="{% url 'postPet' %}" enctype="multipart/form-data">
+        {% csrf_token %}
       <!-- 第1页：宠物信息填写 -->
       <div id="page1" class="form-section active">
         <div class="mb-3">
