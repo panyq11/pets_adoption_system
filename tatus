@@ -1,0 +1,31 @@
+[33m2c2016f[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #1 from panyq11/clark
+[33mf903cf0[m 代码提交
+[33m880235c[m fix urls
+[33md5356db[m Removed cached .pyc files
+[33mcdc33e4[m Update
+[33m59879fd[m Removed cached .pyc files
+[33m9ee0833[m Update
+[33m57406be[m Update
+[33ma1bb006[m 保存本地更改
+[33m81b30d5[m 3.10日代码提交
+[33m5ce85fd[m Update adoptions app
+[33m3369107[m Update .gitignore
+[33m287a718[m add media and data script
+[33ma77be89[m Update settings.py
+[33m4299ff6[m Update
+[33m83bbfb1[m Merge remote-tracking branch 'origin/main'
+[33m0f89fc3[m 重新上传的代码
+[33m3044695[m create directory of static and media
+[33m0d6dd7e[m Delete static
+[33m167ff09[m Create static
+[33mda4c4e6[m Merge remote-tracking branch 'origin/main'
+[33m510acf7[m user表添加到了accounts; AdoptionReview添加到了adoptions; Pet PetImage PostReview添加到了posts.
+[33m2f86fd6[m Update .gitignore
+[33mbd2c910[m Update .gitignore
+[33m89686a8[m Save local changes before pull
+[33md6704e5[m Add post_pet_info model
+[33mff3326a[m Update .gitignore
+[33mb1def60[m Initial models
+[33m52a00b7[m Initial
+[33m1440797[m Initial
+[33m365e9b9[m Initial commit

@@ -11,6 +11,9 @@ urlpatterns = [
     # 注册页面，由自定义的 register 视图处理
     path('register/', views.register, name='register'),
 
-    path('profile/', views.profile, name='profile')
+    path('profile/', views.profile, name='profile'),
 
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),  # 新增管理员页面
+
+    path("logout/", views.logout_view, name="logout"),  # 添加 logout 路由
 ]

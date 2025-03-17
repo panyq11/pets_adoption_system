@@ -60,7 +60,12 @@ def yfLogin(request):
             if user is not None:
                 print(f"✅ 用户 {username} 登录成功！")
                 login(request, user)  # 登录用户
-                return redirect("adoptions:available_pets")  # 🚀 登录成功后跳转
+
+                # 🚀 **判断用户类型**
+                if user.user_type == "Admin":
+                    return redirect(reverse("admin_dashboard:admin_dashboard"))  # **管理员跳转**
+                else:
+                    return redirect("adoptions:available_pets")  # 🚀 登录成功后跳转
             else:
                 print("❌ 无效的用户名或密码")
                 form.add_error(None, "Invalid username or password")
@@ -68,9 +73,19 @@ def yfLogin(request):
         return render(request, 'accounts/login.html', {"form": form})  # 显示错误信息
 
 
+def logout_view(request):
+    logout(request)
+    return redirect(reverse("accounts:yfLogin"))
+
+
 
 def profile(request):
     return render(request, 'accounts/profile.html')
+
+
+def admin_dashboard(request):
+    """🐾 管理员控制面板"""
+    return render(request, "admin_dashboard/admin_dashboard.html")
 
 
 
