@@ -68,6 +68,7 @@ def post_pet(request):
 
             # **📸 存储宠物图片**
             images = request.FILES.getlist('pet_image')[:6]  # 限制 6 张
+            print(f"images: {images}")
 
             for image in images:
                 pet_image = PetImage.objects.create(pet=pet, pet_image=image)
