@@ -60,25 +60,27 @@ def apply_for_adoption(request, pet_id):
     pet = get_object_or_404(Pet, pet_id=pet_id)
 
     if request.method == "POST":
-        form = AdoptPetInfoForm(request.POST)
-        if form.is_valid():
-            adopt_info = form.save(commit=False)
+        current_application = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
 
-            adopt_info.pet = pet
-            adopt_info.user = request.user
-            # 这里暂时用当前用户作为操作员
-            adopt_info.operator = request.user
-            adopt_info.save()
+        if current_application is None:
+            form = AdoptPetInfoForm(request.POST)
+            if form.is_valid():
+                adopt_info = form.save(commit=False)
 
-            return redirect('adoptions:adoption_approval_status')
-    else:
-        form = AdoptPetInfoForm()
+                adopt_info.pet = pet
+                adopt_info.user = request.user
+                # 这里暂时用当前用户作为操作员
+                adopt_info.operator = request.user
+                adopt_info.save()
 
-    context = {
-        'form': form,
-        'pet': pet,
-    }
-    return render(request, 'adoptions/apply_for_adoption.html', context)
+                return redirect('adoptions:adoption_approval_status')
+            else:
+                messages.error(request, "请先完成当前的申请！")
+                return redirect('adoptions:my_application')
+    return redirect('adoptions:available_pets')
+
+
+
 
 
 def my_application(request):
