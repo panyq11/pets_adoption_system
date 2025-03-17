@@ -13,7 +13,7 @@ def available_pets(request):
     username = request.session.get('username', request.user.username)
     user = get_object_or_404(User, username=username)
 
-    pets = Pet.objects.all()
+    pets = Pet.objects.filter(postpetinfo__status='Approved').distinct()
 
     search_query = request.GET.get('q', '').strip()
     pet_type = request.GET.get('pet_type', '').strip()
