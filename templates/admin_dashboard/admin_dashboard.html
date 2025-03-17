@@ -26,6 +26,22 @@
       color: var(--text-dark);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+    /* 自定义橙色按钮 */
+    .btn-orange {
+      background-color: var(--primary-orange);
+      border-color: var(--primary-orange);
+      color: #fff;
+    }
+    .btn-orange:hover {
+      background-color: #e5941f;
+      border-color: #e5941f;
+      color: #fff;
+    }
+    .btn-orange:active {
+      background-color: #cc8c2a;
+      border-color: #cc8c2a;
+      color: #fff;
+    }
     /* 左侧导航栏 */
     .sidebar {
       width: 220px;
@@ -107,14 +123,18 @@
       border-radius: 4px;
       z-index: 100;
     }
-    .admin-menu a {
+    .admin-menu a, .admin-menu button {
       display: block;
       padding: 8px 12px;
       text-decoration: none;
       color: var(--text-dark);
       transition: background-color 0.2s ease;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
     }
-    .admin-menu a:hover {
+    .admin-menu a:hover, .admin-menu button:hover {
       background-color: var(--light-gray);
     }
     /* 主内容区域 */
@@ -214,12 +234,18 @@
   <!-- 顶部栏 -->
   <div class="topbar">
     <div class="search-filter">
-      <input type="text" id="searchInput" placeholder="Search for user or pet...">
+      <form method="GET" action="{% url 'admin_dashboard:admin_dashboard' %}">
+      <input type="text" id="searchInput" name="keyword" placeholder="Search for user or pet..." value="{{ request.GET.keyword|default:'' }}">
+      <button id="searchButton" type="submit" class="btn btn-orange">Search</button>
+      </form>
     </div>
     <div class="admin-dropdown">
       <img src="https://via.placeholder.com/40?text=Admin" alt="Admin" class="admin-avatar" id="adminAvatar">
       <div class="admin-menu" id="adminMenu">
-        <a href="/login">Logout</a>
+        <form action="{% url 'accounts:logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-orange">Logout</button>
+        </form>
       </div>
     </div>
   </div>
@@ -241,29 +267,33 @@
               <th>Address</th>
               <th>Birthday</th>
               <th>Created Time</th>
-              <th>Updated Time</th>
-              <th>User Status</th>
+              <th>Last Login</th>
             </tr>
           </thead>
           <tbody id="users-tbody">
-            <!-- 示例数据，后端可动态生成 -->
+          {% for user in users_list %}
             <tr>
-              <td>1</td>
-              <td><img src="https://via.placeholder.com/40" alt="User" class="avatar"></td>
-              <td>JohnDoe</td>
-              <td>john@example.com</td>
-              <td>+1 234-567-890</td>
-              <td>123 Main St, City</td>
-              <td>1990-05-15</td>
-              <td>2023-01-01 10:00</td>
-              <td>2023-02-01 14:30</td>
+              <td>{{ forloop.counter }}</td>
               <td>
-                <select class="status-select">
-                  <option value="Active" selected>Active</option>
-                  <option value="Banned">Banned</option>
-                </select>
+                {% if user.user_image %}
+                <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="avatar">
+                {% else %}
+                <img src="https://via.placeholder.com/40" alt="No Image" class="avatar">
+                {% endif %}
               </td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.phone_no }}</td>
+              <td>{{ user.address }}</td>
+              <td>{{ user.birthday  }}</td>
+              <td>{{ user.date_joined|date:"j F Y, g:i A"}}</td>
+              <td>{{ user.last_login|date:"j F Y, g:i A"}}</td>
             </tr>
+          {% empty %}
+            <tr>
+                <td colspan="9">No registered users yet.</td>
+            </tr>
+          {% endfor %}
           </tbody>
         </table>
       </div>
@@ -272,11 +302,10 @@
     <!-- Pets 区域 -->
     <div id="pets-section" class="hidden">
       <h4>Pets</h4>
-      <!-- Pets 子导航 -->
+      <!-- Pets 子导航（去掉 Add New） -->
       <div class="pet-sub-nav">
         <a href="#" id="pet-cat" class="active">Cat</a>
         <a href="#" id="pet-dog">Dog</a>
-        <a href="#" id="pet-addnew">Add New</a>
       </div>
       <!-- Cat 列表 -->
       <div id="cat-section">
@@ -294,30 +323,29 @@
                 <th>Size</th>
                 <th>Pet Passport</th>
                 <th>Vaccinated</th>
-                <th>Pet Status</th>
                 <th>Created Time</th>
               </tr>
             </thead>
             <tbody id="cat-tbody">
+            {% for pet in pets_list_cats %}
               <tr>
-                <td>1</td>
-                <td><img src="https://via.placeholder.com/40" alt="Pet" class="pet-image"></td>
-                <td>Cindy</td>
-                <td>Female</td>
-                <td>Blue Golden Shaded</td>
-                <td>2y</td>
-                <td>700g</td>
-                <td>Small</td>
-                <td>C123456</td>
-                <td>Yes</td>
-                <td>
-                  <select class="status-select">
-                    <option value="Available" selected>Available</option>
-                    <option value="Adopted">Adopted</option>
-                  </select>
-                </td>
-                <td>2025-03-01 09:15</td>
+                <td>{{ forloop.counter }}</td>
+                <td><img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="pet-image"></td>
+                <td>{{ pet.name }}</td>
+                <td>{{ pet.sex }}</td>
+                <td>{{ pet.breed }}</td>
+                <td>{{ pet.age }}</td>
+                <td>{{ pet.weight }}</td>
+                <td>{{ pet.size }}</td>
+                <td>{{ pet.passport_number }}</td>
+                <td>{{ pet.vaccinated }}</td>
+                <td>{{ pet.created_at|date:"j F Y, g:i A"}}</td>
               </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11">No cats available.</td>
+            </tr>
+            {% endfor %}
             </tbody>
           </table>
         </div>
@@ -338,38 +366,32 @@
                 <th>Size</th>
                 <th>Pet Passport</th>
                 <th>Vaccinated</th>
-                <th>Pet Status</th>
                 <th>Created Time</th>
               </tr>
             </thead>
             <tbody id="dog-tbody">
+            {% for pet in pets_list_dogs %}
               <tr>
-                <td>1</td>
-                <td><img src="https://via.placeholder.com/40" alt="Pet" class="pet-image"></td>
-                <td>Luna</td>
-                <td>Female</td>
-                <td>Husky</td>
-                <td>1y</td>
-                <td>10kg</td>
-                <td>Medium</td>
-                <td>D100001</td>
-                <td>No</td>
-                <td>
-                  <select class="status-select">
-                    <option value="Available" selected>Available</option>
-                    <option value="Adopted">Adopted</option>
-                  </select>
-                </td>
-                <td>2025-03-02 16:45</td>
+                <td>{{ forloop.counter }}</td>
+                <td><img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="pet-image"></td>
+                <td>{{ pet.name }}</td>
+                <td>{{ pet.sex }}</td>
+                <td>{{ pet.breed }}</td>
+                <td>{{ pet.age }}</td>
+                <td>{{ pet.weight }}</td>
+                <td>{{ pet.size }}</td>
+                <td>{{ pet.passport_number }}</td>
+                <td>{{ pet.vaccinated }}</td>
+                <td>{{ pet.created_at|date:"j F Y, g:i A"}}</td>
               </tr>
+            {% empty %}
+            <tr>
+            <td colspan="11">No dogs available.</td>
+            </tr>
+            {% endfor %}
             </tbody>
           </table>
         </div>
-      </div>
-      <!-- Add New -->
-      <div id="addnew-section" class="hidden">
-        <h5>Add New Pet</h5>
-        <p>Here is a form to add new pets...</p>
       </div>
     </div>
 
@@ -436,6 +458,7 @@
               <th>#</th>
               <th>Pet Image</th>
               <th>Pet Name</th>
+              <th>Type</th>
               <th>Sex</th>
               <th>Breed</th>
               <th>Age</th>
@@ -443,6 +466,13 @@
               <th>Size</th>
               <th>Pet Passport</th>
               <th>Vaccinated</th>
+              <th>User Email</th>
+              <th>Home Type</th>
+              <th>Home Ownership</th>
+              <th>Other Pets</th>
+              <th>Children Number</th>
+              <th>Experience</th>
+              <th>Reason</th>
               <th>Submission Time</th>
               <th>Review Time</th>
               <th>Operator</th>
@@ -450,38 +480,114 @@
             </tr>
           </thead>
           <tbody id="postreview-tbody">
+            {% for post in post_list %}
             <tr>
-              <td>1</td>
-              <td><img src="https://via.placeholder.com/40" alt="Pet" class="pet-image"></td>
-              <td>Max</td>
-              <td>Male</td>
-              <td>German Shepherd</td>
-              <td>3y</td>
-              <td>20kg</td>
-              <td>Large</td>
-              <td>P987654</td>
-              <td>Yes</td>
-              <td>2025-03-02 10:00</td>
-              <td>2025-03-03 15:00</td>
-              <td>OperatorC</td>
+              <td>{{ forloop.counter }}</td>
+              <td><img src="{{ post.pet.image.url }}" alt="Pet" class="pet-image"></td>
+              <td>{{ post.pet.name }}</td>
+              <td>{{ post.pet.type }}</td>
+              <td>{{ post.pet.sex }}</td>
+              <td>{{ post.pet.breed }}</td>
+              <td>{{ post.pet.age }}</td>
+              <td>{{ post.pet.weight }}</td>
+              <td>{{ post.pet.size }}</td>
+              <td>{{ post.pet_passport }}</td>
+              <td>{{ post.vaccinated }}</td>
+              <td>{{ post.email }}</td>
+              <td>{{ post.home_type }}</td>
+              <td>{{ post.home_ownership }}</td>
+              <td>{{ post.has_other_pets }}</td>
+              <td>{{ post.has_children }}</td>
+              <td>{{ post.experience_with_pets }}</td>
+              <td>{{ post.reason_for_fostering }}</td>
+              <td>{{ post.created_at|date:"j F Y, g:i A" }}</td>
+              <td>{{ post.review_time|date:"j F Y, g:i A" }}</td>
+              <td>Admin</td>
               <td>
-                <select class="status-select">
-                  <option value="Pending" selected>Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
+                <form method="POST" action="{% url 'admin_dashboard:update_post_status' post.post_info_id %}" class="d-flex flex-column align-items-center">
+                  {% csrf_token %}
+                  <select name="status" class="form-select form-select-sm" style="border-radius: 14px; width: auto;">
+                    <option value="Pending" {% if post.status == "Pending" %}selected{% endif %}>Pending</option>
+                    <option value="Approved" {% if post.status == "Approved" %}selected{% endif %}>Approved</option>
+                    <option value="Rejected" {% if post.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                  </select>
+                  <!-- 与选择框之间留一点间距 -->
+                  <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;">
+                    Update
+                  </button>
+                </form>
               </td>
             </tr>
+            {% empty %}
+            <tr>
+              <td colspan="22" class="text-center">No posts pending review.</td>
+            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
-
   </div><!-- /main-content -->
+
+  {% if messages %}
+  <div id="django-messages" style="display: none;">
+    {% for message in messages %}
+      <div data-message-tags="{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Status Update Modal -->
+  <div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-labelledby="statusUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Status Updated</h5>
+        </div>
+        <div class="modal-body">
+          The post review has been successfully updated.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-orange" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tab = urlParams.get('tab');
+      const keyword = urlParams.get("keyword");
+      if (tab === "users") {
+        document.getElementById("nav-users").click();
+        } else if (tab === "pets") {
+        document.getElementById("nav-pets").click();
+        }
+
+       // 监听搜索框清空，自动恢复默认视图
+        const searchInput = document.getElementById("searchInput");
+        searchInput.addEventListener("input", function() {
+            if (searchInput.value.trim() === "") {
+                window.location.href = window.location.pathname;  // 只保留原始 URL
+            }
+        });
+
+
+      const messages = document.querySelectorAll('[data-message-tags]');
+      messages.forEach(message => {
+        if (message.getAttribute('data-message-tags').includes("success")) {
+          var statusModal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
+          statusModal.show();
+        }
+      });
+    });
+  </script>
+
+  <script>
+    const usersTbody = document.getElementById("users-tbody");
     // 主导航切换：Users, Pets, Adoption Review, Post Review
     const navUsers = document.getElementById("nav-users");
     const navPets = document.getElementById("nav-pets");
@@ -511,6 +617,8 @@
       navUsers.classList.add("active");
       hideAllMainSections();
       usersSection.classList.remove("hidden");
+      // 重置 Users 表格过滤
+      resetTableFilter("users-tbody");
     });
     navPets.addEventListener("click", e => {
       e.preventDefault();
@@ -518,6 +626,9 @@
       navPets.classList.add("active");
       hideAllMainSections();
       petsSection.classList.remove("hidden");
+      // 重置 Pets 表格过滤（猫和狗）
+      resetTableFilter("cat-tbody");
+      resetTableFilter("dog-tbody");
     });
     navAdoption.addEventListener("click", e => {
       e.preventDefault();
@@ -534,24 +645,20 @@
       postreviewSection.classList.remove("hidden");
     });
 
-    // Pets 子导航切换：Cat, Dog, Add New
+    // Pets 子导航切换：Cat, Dog
     const petCat = document.getElementById("pet-cat");
     const petDog = document.getElementById("pet-dog");
-    const petAddnew = document.getElementById("pet-addnew");
 
     const catSection = document.getElementById("cat-section");
     const dogSection = document.getElementById("dog-section");
-    const addnewSection = document.getElementById("addnew-section");
 
     function hideAllPetSubSections() {
       catSection.classList.add("hidden");
       dogSection.classList.add("hidden");
-      addnewSection.classList.add("hidden");
     }
     function removeActiveFromPetSubNav() {
       petCat.classList.remove("active");
       petDog.classList.remove("active");
-      petAddnew.classList.remove("active");
     }
     petCat.addEventListener("click", e => {
       e.preventDefault();
@@ -559,6 +666,8 @@
       petCat.classList.add("active");
       hideAllPetSubSections();
       catSection.classList.remove("hidden");
+      // 重置猫表格过滤
+      resetTableFilter("cat-tbody");
     });
     petDog.addEventListener("click", e => {
       e.preventDefault();
@@ -566,13 +675,8 @@
       petDog.classList.add("active");
       hideAllPetSubSections();
       dogSection.classList.remove("hidden");
-    });
-    petAddnew.addEventListener("click", e => {
-      e.preventDefault();
-      removeActiveFromPetSubNav();
-      petAddnew.classList.add("active");
-      hideAllPetSubSections();
-      addnewSection.classList.remove("hidden");
+      // 重置狗表格过滤
+      resetTableFilter("dog-tbody");
     });
 
     // 管理员头像下拉菜单
@@ -586,116 +690,115 @@
       adminMenu.style.display = "none";
     });
 
-    // 搜索示例
+    // 搜索功能
     const searchInput = document.getElementById("searchInput");
-    searchInput.addEventListener("input", () => {
-      const keyword = searchInput.value.toLowerCase();
-      console.log("Searching for:", keyword);
-      // 此处可根据 keyword 过滤各区域数据
-    });
-  </script>
-  <!--
-    测试案例（静态）：可解除注释后自动生成示例数据
-    实际项目中请由后端传递数据
-  -->
-  <!--
-  <script>
-    // 示例数据：Users
-    const usersData = [
-      {
-        user_image: "https://via.placeholder.com/40",
-        username: "Alice",
-        email: "alice@example.com",
-        phone: "+1 987-654-321",
-        address: "456 River Rd, City",
-        birthday: "1992-08-10",
-        created_time: "2023-02-01 12:00",
-        updated_time: "2023-03-05 09:15",
-        status: "Active"
-      },
-      {
-        user_image: "https://via.placeholder.com/40",
-        username: "Bob",
-        email: "bob@example.com",
-        phone: "+1 111-222-333",
-        address: "789 Hill St, City",
-        birthday: "1985-12-25",
-        created_time: "2022-12-01 10:00",
-        updated_time: "2023-02-15 08:30",
-        status: "Banned"
+    const searchButton = document.getElementById("searchButton");
+
+    function resetTableFilter(tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      if (tbody) {
+        const rows = tbody.getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+          rows[i].style.display = "";
+        }
       }
-    ];
-    const usersTbody = document.getElementById("users-tbody");
-    usersTbody.innerHTML = "";
-    usersData.forEach((user, i) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${i + 1}</td>
-        <td><img src="${user.user_image}" alt="User" class="avatar"></td>
-        <td>${user.username}</td>
-        <td>${user.email}</td>
-        <td>${user.phone}</td>
-        <td>${user.address}</td>
-        <td>${user.birthday}</td>
-        <td>${user.created_time}</td>
-        <td>${user.updated_time}</td>
-        <td>
-          <select class="status-select">
-            <option value="Active" ${user.status === "Active" ? "selected" : ""}>Active</option>
-            <option value="Banned" ${user.status === "Banned" ? "selected" : ""}>Banned</option>
-          </select>
-        </td>
-      `;
-      usersTbody.appendChild(row);
+    }
+
+    searchButton.addEventListener("click", () => {
+      const keyword = searchInput.value.toLowerCase().trim();
+      if (keyword === "") {
+        // 若搜索为空，重置 Users 与 Pets 表格
+        resetTableFilter("users-tbody");
+        resetTableFilter("cat-tbody");
+        resetTableFilter("dog-tbody");
+        return;
+      }
+
+      let foundInUsers = false;
+      let foundInCats = false;
+      let foundInDogs = false;
+
+      // 在 Users 中搜索
+      const usersRows = document.querySelectorAll("#users-tbody tr");
+      usersMatched = false;
+      usersSection.classList.add("hidden");
+      usersSection.classList.remove("hidden");
+      for (let row of usersTbody.rows) {
+        const rowText = row.textContent.toLowerCase();
+        if (rowText.includes(keyword)) {
+          row.style.display = "";
+          foundInUsers = true;
+        } else {
+          row.style.display = "none";
+        }
+      }
+      if (foundInUsers) {
+        removeActiveFromNav();
+        navUsers.classList.add("active");
+        hideAllMainSections();
+        usersSection.classList.remove("hidden");
+        return;
+      }
+
+
+        // 在 Pets（猫和狗）中搜索
+        const catTbody = document.getElementById("cat-tbody");
+        const dogTbody = document.getElementById("dog-tbody");
+
+        let catMatches = 0;
+        let dogMatches = 0;
+
+        for (let row of catTbody.rows) {
+            if (row.textContent.toLowerCase().includes(keyword)) {
+              row.style.display = "";
+              catMatches++;
+            } else {
+              row.style.display = "none";
+            }
+        }
+
+        for (let row of dogTbody.rows) {
+            if (row.textContent.toLowerCase().includes(keyword)) {
+              row.style.display = "";
+              dogMatches++;
+            } else {
+              row.style.display = "none";
+            }
+        }
+
+        if (catMatches > 0 || dogMatches > 0) {
+          removeActiveFromNav();
+          navPets.classList.add("active");
+          hideAllMainSections();
+          petsSection.classList.remove("hidden");
+          // 激活有匹配的子导航（若猫和狗都有，则默认激活猫）
+          if (catMatches > 0) {
+            petCat.classList.add("active");
+            petDog.classList.remove("active");
+            catSection.classList.remove("hidden");
+            dogSection.classList.add("hidden");
+          } else if (dogMatches > 0) {
+            petDog.classList.add("active");
+            petCat.classList.remove("active");
+            dogSection.classList.remove("hidden");
+            catSection.classList.add("hidden");
+          }
+          return;
+      }
+
+      if (!foundInUsers && catMatches === 0 && dogMatches === 0) {
+        alert("No matching results found.");
+      }
     });
 
-    // 示例数据：Post Review（补全版）
-    const postReviewData = [
-      {
-        pet_image: "https://via.placeholder.com/40",
-        pet_name: "Max",
-        sex: "Male",
-        breed: "German Shepherd",
-        age: "3y",
-        weight: "20kg",
-        size: "Large",
-        pet_passport: "P987654",
-        vaccinated: "Yes",
-        submission_time: "2025-03-02 10:00",
-        review_time: "2025-03-03 15:00",
-        operator: "OperatorC",
-        status: "Rejected"
+    // 可选：当搜索框清空时重置过滤
+    searchInput.addEventListener("input", () => {
+      if (searchInput.value.trim() === "") {
+        resetTableFilter("users-tbody");
+        resetTableFilter("cat-tbody");
+        resetTableFilter("dog-tbody");
       }
-    ];
-    const postReviewTbody = document.getElementById("postreview-tbody");
-    postReviewTbody.innerHTML = "";
-    postReviewData.forEach((post, i) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${i + 1}</td>
-        <td><img src="${post.pet_image}" alt="Pet" class="pet-image"></td>
-        <td>${post.pet_name}</td>
-        <td>${post.sex}</td>
-        <td>${post.breed}</td>
-        <td>${post.age}</td>
-        <td>${post.weight}</td>
-        <td>${post.size}</td>
-        <td>${post.pet_passport}</td>
-        <td>${post.vaccinated}</td>
-        <td>${post.submission_time}</td>
-        <td>${post.review_time}</td>
-        <td>${post.operator}</td>
-        <td>
-          <select class="status-select">
-            <option value="Pending" ${post.status === "Pending" ? "selected" : ""}>Pending</option>
-            <option value="Approved" ${post.status === "Approved" ? "selected" : ""}>Approved</option>
-            <option value="Rejected" ${post.status === "Rejected" ? "selected" : ""}>Rejected</option>
-          </select>
-        </td>
-      `;
-      postReviewTbody.appendChild(row);
     });
   </script>
-  -->
 </body>
 </html>

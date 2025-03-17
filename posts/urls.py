@@ -6,4 +6,6 @@ urlpatterns = [
     path('', views.post_pet, name='postPet'),  # 宠物发布问卷界面
     path('my_posts/', views.my_posts, name='myPost'),  # 发布历史
     path('review_status/', views.review_status, name='postReview'),  # 发布审核
+    path('delete_pet/<int:pet_id>/', views.delete_pet, name='delete_pet'),  # 发布审核
+
 ]

@@ -136,7 +136,7 @@
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
       <!-- 点击后跳转到主页 -->
-      <a class="navbar-brand" href="/">Your Furry Friends</a>
+      <a class="navbar-brand" href="/adoptions/">Your Furry Friends</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -151,7 +151,7 @@
             <a class="nav-link" href="/posts/my_posts/">My Posts</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/posts/review_status/">Post Review</a>
+            <a class="nav-link" href="/posts/review_status/">Post Progress</a>
           </li>
         </ul>
       </div>
@@ -170,59 +170,92 @@
     </ul>
   </div>
 
+
+   {% if messages %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      {% for message in messages %}
+        Swal.fire({
+          icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+          title: "{% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Error{% else %}Notice{% endif %}",
+          text: "{{ message|escapejs }}",
+          confirmButtonText: "OK"
+        });
+      {% endfor %}
+    });
+  </script>
+{% endif %}
+
+
+
   <!-- 主内容 -->
   <div class="container mb-5">
-    <form id="petForm">
+    <form id="petForm" method="POST" action="{% url 'posts:postPet' %}" enctype="multipart/form-data">
+        {% csrf_token %}
       <!-- 第1页：宠物信息填写 -->
       <div id="page1" class="form-section active">
         <div class="mb-3">
           <label for="petName" class="form-label">Pet Name</label>
-          <input type="text" class="form-control" id="petName" name="petName" placeholder="Enter pet name">
+          <input type="text" class="form-control" id="petName" name="name" placeholder="Enter pet name">
         </div>
         <div class="mb-3">
           <label for="petPhotos" class="form-label">Pet Photos (max 6 images)</label>
-          <input type="file" class="form-control" id="petPhotos" name="petPhotos" accept="image/*" multiple>
+          <input type="file" class="form-control" id="petPhotos" name="pet_image" accept="image/*" multiple>
           <div id="preview-container" class="mt-3 d-flex flex-wrap"></div>
         </div>
+
+          <div class="mb-3">
+          <label for="petGender" class="form-label">Type</label>
+          <select class="form-select" id="petGender" name="type">
+            <option value="">Select Type</option>
+            <option value="Dog">Dog</option>
+            <option value="Cat">Cat</option>
+          </select>
+        </div>
+
         <div class="mb-3">
           <label for="petGender" class="form-label">Pet Gender</label>
-          <select class="form-select" id="petGender" name="petGender">
+          <select class="form-select" id="petGender" name="sex">
             <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
           </select>
         </div>
         <div class="mb-3">
           <label for="petBreed" class="form-label">Breed</label>
-          <input type="text" class="form-control" id="petBreed" name="petBreed" placeholder="Enter pet breed">
+          <input type="text" class="form-control" id="petBreed" name="breed" placeholder="Enter pet breed">
         </div>
-        <div class="mb-3">
-          <label for="petAge" class="form-label">Age</label>
-          <input type="number" class="form-control" id="petAge" name="petAge" min="0" placeholder="e.g., 2">
+          <div class="mb-3">
+          <label for="petGender" class="form-label">Age</label>
+          <select class="form-select" id="petGender" name="age">
+            <option value="">Select Age</option>
+            <option value="Young">Young</option>
+            <option value="Adult">Adult</option>
+          </select>
         </div>
         <div class="mb-3">
           <label for="petWeight" class="form-label">Weight (kg)</label>
-          <input type="number" class="form-control" id="petWeight" name="petWeight" min="0" step="0.1" placeholder="e.g., 5.5">
+          <input type="number" class="form-control" id="petWeight" name="weight" min="0" step="0.1" placeholder="e.g., 5.5">
         </div>
         <div class="mb-3">
           <label for="petSize" class="form-label">Size</label>
-          <select class="form-select" id="petSize" name="petSize">
+          <select class="form-select" id="petSize" name="size">
             <option value="">Select Size</option>
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
+            <option value="Small">Small</option>
+            <option value="Medium">Medium</option>
+            <option value="Large">Large</option>
           </select>
         </div>
         <div class="mb-3">
           <label for="petPassport" class="form-label">Pet Passport</label>
-          <input type="text" class="form-control" id="petPassport" name="petPassport" placeholder="Enter pet passport info">
+          <input type="text" class="form-control" id="petPassport" name="pet_passport" placeholder="Enter pet passport info">
         </div>
         <div class="mb-3">
           <label for="vaccineStatus" class="form-label">Vaccinated</label>
-          <select class="form-select" id="vaccineStatus" name="vaccineStatus">
+          <select class="form-select" id="vaccineStatus" name="vaccinated">
             <option value="">Select Option</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
           </select>
         </div>
       </div>
@@ -231,35 +264,35 @@
       <div id="page2" class="form-section">
         <div class="mb-3">
           <label for="userEmail" class="form-label">Email</label>
-          <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter your email" required>
+          <input type="email" class="form-control" id="userEmail" name="email" placeholder="Enter your email" required>
         </div>
         <div class="mb-3">
           <label for="homeType" class="form-label">Home Type</label>
-          <select class="form-select" id="homeType" name="homeType">
+          <select class="form-select" id="homeType" name="home_type">
             <option value="">Select Home Type</option>
-            <option value="apartment">Apartment</option>
-            <option value="house">House</option>
-            <option value="townhouse">Townhouse</option>
-            <option value="rural">Farm/Rural</option>
+            <option value="Apartment">Apartment</option>
+            <option value="House">House</option>
+            <option value="Townhouse">Townhouse</option>
+            <option value="Farm/Rural">Farm/Rural</option>
           </select>
         </div>
         <div class="mb-3">
           <label for="homeOwnership" class="form-label">Home Ownership</label>
-          <select class="form-select" id="homeOwnership" name="homeOwnership">
+          <select class="form-select" id="homeOwnership" name="home_ownership">
             <option value="">Select Ownership</option>
-            <option value="own">Own</option>
-            <option value="rent">Rent</option>
-            <option value="withParents">Living with Parents</option>
-            <option value="other">Other</option>
+            <option value="Own">Own</option>
+            <option value="Rent">Rent</option>
+            <option value="Living with parents">Living with Parents</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         <div class="mb-3">
           <label for="otherPets" class="form-label">Other Pets</label>
-          <input type="text" class="form-control" id="otherPets" name="otherPets" placeholder="Describe other pets (quantity and breed)">
+          <input type="text" class="form-control" id="otherPets" name="has_other_pets" placeholder="Describe other pets (quantity and breed)">
         </div>
         <div class="mb-3">
           <label for="childrenCount" class="form-label">Number of Children</label>
-          <select class="form-select" id="childrenCount" name="childrenCount">
+          <select class="form-select" id="childrenCount" name="has_children">
             <option value="">Select Number</option>
             <option value="0">0</option>
             <option value="1">1</option>
@@ -271,11 +304,11 @@
         </div>
         <div class="mb-3">
           <label for="experience" class="form-label">Pet Experience</label>
-          <textarea class="form-control" id="experience" name="experience" rows="4" placeholder="Describe your pet care experience"></textarea>
+          <textarea class="form-control" id="experience" name="experience_with_pets" rows="4" placeholder="Describe your pet care experience"></textarea>
         </div>
         <div class="mb-3">
           <label for="reason" class="form-label">Fostering Reason</label>
-          <textarea class="form-control" id="reason" name="reason" rows="4" placeholder="Explain your reason for fostering"></textarea>
+          <textarea class="form-control" id="reason" name="reason_for_fostering" rows="4" placeholder="Explain your reason for fostering"></textarea>
         </div>
       </div>
 
@@ -287,6 +320,13 @@
       </div>
     </form>
   </div>
+
+  <!-- ✅ Django 成功消息（隐藏） -->
+  <div id="success-message" data-message="{% for message in messages %}{{ message }}{% endfor %}" style="display:none;"></div>
+
+  <!-- ✅ SweetAlert2（弹出成功/失败提示框） -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -6,11 +6,14 @@ app_name = 'accounts'  # 定义当前应用名称，方便在模板中使用 URL
 
 urlpatterns = [
     # 登录页面,
-    path('', views.accounts, name='login'),
+    path('', views.yfLogin, name='yfLogin'),
 
     # 注册页面，由自定义的 register 视图处理
     path('register/', views.register, name='register'),
 
-    path('profile/', views.profile, name='profile')
+    path('profile/', views.profile, name='profile'),
 
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),  # 新增管理员页面
+
+    path("logout/", views.logout_view, name="logout"),  # 添加 logout 路由
 ]

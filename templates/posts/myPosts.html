@@ -106,13 +106,38 @@
     .status-badge.rejected {
       background-color: var(--status-rejected);
     }
+
+    /* 🟠 统一风格的橙色按钮 */
+.btn-orange {
+  background-color: var(--primary-orange); /* #F9AA33 */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+/* 🟠 悬停 & 点击效果 */
+.btn-orange:hover {
+  background-color: #e2982c; /* 深一点的橙色 */
+  transform: scale(1.05);
+}
+
+.btn-orange:active {
+  background-color: #d48b27;
+  transform: scale(0.95);
+}
+
+
   </style>
 </head>
 <body>
   <!-- 导航栏 -->
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
-      <a class="navbar-brand" href="/">Your Furry Friends</a>
+      <a class="navbar-brand" href="/adoptions/">Your Furry Friends</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -126,7 +151,7 @@
             <a class="nav-link active" href="/posts/my_posts/">My Posts</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/posts/review_status/">Post Review</a>
+            <a class="nav-link" href="/posts/review_status/">Post Progress</a>
           </li>
         </ul>
       </div>
@@ -144,12 +169,25 @@
           <div class="status-badge {{ pet.status|lower }}">
             {{ pet.status }}
           </div>
-          <img src="{{ pet.image_url|default:'https://via.placeholder.com/400x300' }}"
-               alt="{{ pet.name }}" class="card-img-top">
+
+            <!-- ✅ 显示宠物的第一张图片 -->
+        {% with pet.images.all|first as first_image %}
+          {% if first_image %}
+            <img src="{{ first_image.pet_image.url }}" class="card-img-top" alt="{{ pet.name }}">
+          {% else %}
+            <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="{{ pet.name }}">
+          {% endif %}
+        {% endwith %}
+
           <div class="card-body">
             <h5 class="card-title">{{ pet.name }}</h5>
-            <p class="text-muted mb-1">Submission Time: {{ pet.submission_time }}</p>
+            <p class="text-muted mb-1">Submission Time: {{ pet.created_at }}</p>
             <p class="text-muted mb-1">Review Result Time: {{ pet.review_time|default:'-' }}</p>
+
+            <a href="javascript:void(0);"
+            class="btn btn-orange btn-sm"
+            onclick="confirmDelete({{ pet.pet_id }}, '{{ pet.name }}')">Delete</a>
+
           </div>
         </div>
       </div>
@@ -157,6 +195,84 @@
       <p>No posts available.</p>
       {% endfor %}
     </div>
+
+  <!-- 🔥 删除确认模态框 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmDelete(petId, petName) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to delete '${petName}'. This action cannot be undone!`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#f9aa33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // 使用 FormData 发送空数据，避免 JSON 格式问题
+        const formData = new FormData();
+        fetch(`/posts/delete_pet/${petId}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+          },
+          body: formData
+        })
+        .then(response => {
+          if (response.ok) {
+            Swal.fire({
+              title: "Deleted!",
+              text: `'${petName}' has been deleted.`,
+              icon: "success",
+              confirmButtonColor: "#f9aa33"
+            }).then(() => {
+                // ✅ 这里手动清除 Django messages
+                fetch('/clear_messages/', { method: 'GET' }).then(() => {
+                    location.reload();  // 刷新页面，显示删除后的列表
+                });
+            });
+          } else {
+            response.json().then(data => {
+              console.error("Error response:", data);
+            });
+            Swal.fire({
+              title: "Error!",
+              text: "Something went wrong. Please try again.",
+              icon: "error",
+              confirmButtonColor: "#f9aa33"
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Fetch error:", error);
+          Swal.fire({
+            title: "Error!",
+            text: "Could not connect to server.",
+            icon: "error",
+            confirmButtonColor: "#f9aa33"
+          });
+        });
+      }
+    });
+  }
+
+  // 获取 CSRF 令牌
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
   </div>
 
   <!-- Bootstrap JS Bundle -->
