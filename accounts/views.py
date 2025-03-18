@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate  # ✅ 这里改对了
 from .forms import RegisterForm, LoginForm
 from django.contrib.auth import get_user_model, login, logout
 User = get_user_model()
+from .forms import UserProfileForm
+from django.contrib import messages
 
 @require_http_methods(['GET', 'POST'])
 def register(request):
@@ -80,7 +82,18 @@ def logout_view(request):
 
 
 def profile(request):
-    return render(request, 'accounts/profile.html')
+    user = request.user  # 当前用户
+    if request.method == 'POST':
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=user)
+        if profile_form.is_valid():
+            profile_form.save()
+            login(request, user)  # 重新登录，确保密码更新后不会登出
+            messages.success(request, "Profile updated successfully!")
+            return redirect('profile')
+    else:
+        profile_form = UserProfileForm(instance=user)
+
+    return render(request, 'accounts/Profile.html', {'profile_form': profile_form})
 
 
 def admin_dashboard(request):

@@ -80,3 +80,9 @@ def update_post_status(request, post_id):
 
     messages.success(request, "Pet status updated successfully.")
     return redirect(reverse('admin_dashboard:admin_dashboard'))
+
+
+
+
+
+
