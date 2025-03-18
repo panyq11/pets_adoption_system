@@ -70,6 +70,7 @@ def post_pet(request):
 
             # **📸 存储宠物图片**
             images = request.FILES.getlist('pet_image')[:6]  # 限制 6 张
+            print(f"images: {images}")
 
             for image in images:
                 pet_image = PetImage.objects.create(pet=pet, pet_image=image)
@@ -95,7 +96,7 @@ def post_pet(request):
             # ✅ **弹窗提示**
             messages.success(request, f"🎉 Your pet '{pet.name}' has been posted successfully! Pending approval.")
 
-            return redirect('postPet')  # **刷新当前页面，防止重复提交**
+            return redirect('posts:postPet')  # **刷新当前页面，防止重复提交**
         else:
             print("❌ 表单错误：", pet_form.errors, image_form.errors, post_info_form.errors)
             messages.error(request, "Post failed! Please try again.")  # ✅ Fail

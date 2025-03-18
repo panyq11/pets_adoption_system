@@ -1,43 +1,40 @@
 {% extends 'adoptions/base.html' %}
+
 {% block content %}
 <div class="container mt-4">
-  <h2>Adoption History</h2>
-  <hr>
-  <table class="table table-striped">
+  <h2>My Adoption Application history</h2>
+  <table class="table table-bordered table-striped">
     <thead>
       <tr>
-        <th scope="col">Adoption ID</th>
-        <th scope="col">Pet</th>
-        <th scope="col">Adopted Date</th>
-        <th scope="col">Status</th>
+        <th>Pet Name</th>
+        <th>Application Time</th>
+        <th>Reviewer</th>
+        <th>Review status</th>
+        <th>View Details</th>
       </tr>
     </thead>
     <tbody>
-      <!-- 假设有历史记录 adoption_history -->
-      {% comment %}
-      {% for record in adoption_history %}
-        <tr>
-          <td>{{ record.adopt_info_id }}</td>
-          <td>{{ record.pet.name }}</td>
-          <td>{{ record.created_at|date:"Y-m-d H:i" }}</td>
-          <td>{{ record.get_status_display }}</td>
-        </tr>
+      {% for history in history_list %}
+      <tr>
+        <td>{{ history.pet.name }}</td>
+        <td>{{ history.applied_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          {% if history.operator_username %}
+            {{ history.operator_username.username }}
+          {% else %}
+            Error！
+          {% endif %}
+        </td>
+        <td>{{ history.get_status_display }}</td>
+        <td>
+          <a href="{% url 'pet_detail' history.pet.id %}" class="btn btn-primary btn-sm">View Details</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">There are no records of the application</td>
+      </tr>
       {% endfor %}
-      {% endcomment %}
-
-      <!-- 示例静态数据 -->
-      <tr>
-        <td>1</td>
-        <td>Cindy</td>
-        <td>2025-03-07 15:20</td>
-        <td>Approved</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>Luna</td>
-        <td>2025-02-15 11:00</td>
-        <td>Approved</td>
-      </tr>
     </tbody>
   </table>
 </div>

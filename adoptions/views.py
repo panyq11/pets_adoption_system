@@ -1,12 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+
 from posts.models import Pet, PetImage
-from .models import Pet, AdoptPetInfo
+from accounts.models import User
+from .models import AdoptPetInfo, AdoptionReview
 from .forms import AdoptPetInfoForm
 
 # Create your views here.
 
+#@login_required
 def available_pets(request):
-    pets = Pet.objects.all()
+
+    pets = Pet.objects.filter(postpetinfo__status='Approved').distinct()
 
     search_query = request.GET.get('q', '').strip()
     pet_type = request.GET.get('pet_type', '').strip()
@@ -50,82 +55,53 @@ def pet_detail(request, pet_id):
 
 
 def apply_for_adoption(request, pet_id):
-
+    username = request.session.get('username', request.user.username)
+    user = get_object_or_404(User, username=username)
     pet = get_object_or_404(Pet, pet_id=pet_id)
 
     if request.method == "POST":
-        form = AdoptPetInfoForm(request.POST)
-        if form.is_valid():
-            adopt_info = form.save(commit=False)
-            # 设置外键字段
-            adopt_info.pet = pet
-            adopt_info.user = request.user
-            # 这里暂时用当前用户作为操作员
-            adopt_info.operator = request.user
-            adopt_info.save()
-            # 表单提交成功后跳转到用户的申请列表或其他页面
-            return redirect('adoptions:my_application')
-    else:
-        form = AdoptPetInfoForm()
+        current_application = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
 
-    context = {
-        'form': form,
-        'pet': pet,
-    }
-    return render(request, 'adoptions/apply_for_adoption.html', context)
+        if current_application is None:
+            form = AdoptPetInfoForm(request.POST)
+            if form.is_valid():
+                adopt_info = form.save(commit=False)
+
+                adopt_info.pet = pet
+                adopt_info.user = request.user
+                # 这里暂时用当前用户作为操作员
+                adopt_info.operator = request.user
+                adopt_info.save()
+
+                return redirect('adoptions:adoption_approval_status')
+            else:
+                messages.error(request, "请先完成当前的申请！")
+                return redirect('adoptions:my_application')
+    return redirect('adoptions:available_pets')
+
+
+
 
 
 def my_application(request):
-    # 申请记录数据
-    applications = [
-        {
-            'adopt_info_id': 1,
-            'pet': {'name': 'Cindy'},
-            'created_at': '2025-03-01 10:30',
-            'status': 'Submitted',
-        },
-        {
-            'adopt_info_id': 2,
-            'pet': {'name': 'DianDian'},
-            'created_at': '2025-03-05 14:15',
-            'status': 'Processing',
-        },
-    ]
-    context = {'my_applications': applications}
+    username = request.user.username
+
+    review = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+
+    context = {
+        'review': review,
+    }
+
     return render(request, 'adoptions/my_application.html', context)
 
 
-def adoption_approval_status(request, adopt_info_id):
-    # 审批状态数据
-    adopt_info = {
-        'adopt_info_id': adopt_info_id,
-        'pet': {'name': 'Cindy'},
-        'created_at': '2025-03-05 14:15',
-        'status': 'Processing',
-        'timeline': [
-            {'time': '2025-03-05 14:15', 'status': 'Submitted'},
-            {'time': '2025-03-06 09:00', 'status': 'Processing'},
-        ],
-    }
-    context = {'adopt_info': adopt_info}
-    return render(request, 'adoptions/adoption_approval_status.html', context)
-
 
 def adoption_history(request):
-    # 领养历史数据
-    history = [
-        {
-            'adopt_info_id': 1,
-            'pet': {'name': 'Cindy'},
-            'created_at': '2025-03-07 15:20',
-            'status': 'Approved',
-        },
-        {
-            'adopt_info_id': 2,
-            'pet': {'name': 'Luna'},
-            'created_at': '2025-02-15 11:00',
-            'status': 'Approved',
-        },
-    ]
-    context = {'adoption_history': history}
+    username = request.user.username
+
+    history_list = AdoptionReview.objects.filter(adopter_username__username=username)
+
+    context = {
+        'history_list': history_list,
+    }
     return render(request, 'adoptions/adoption_history.html', context)

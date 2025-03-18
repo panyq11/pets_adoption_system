@@ -26,6 +26,7 @@ class PetImage(models.Model):
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name="images")
     pet_image = models.ImageField(upload_to='pet_images/', null=True, blank=True)
 
+
     def __str__(self):
         return f"Image for {self.pet.name}"
 

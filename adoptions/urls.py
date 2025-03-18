@@ -15,11 +15,8 @@ urlpatterns = [
     # 申请领养宠物，传入宠物 id（用于初始化表单）
     path('apply/<int:pet_id>/', views.apply_for_adoption, name='apply_for_adoption'),
 
-    # 用户查看所有申请记录
-    path('applications/', views.my_application, name='my_application'),
-
     # 查看单个申请的审批状态，传入申请 id
-    path('approval/<int:adopt_info_id>/', views.adoption_approval_status, name='adoption_approval_status'),
+    path('applications/', views.my_application, name='my_application'),
 
     # 查看领养历史记录
     path('history/', views.adoption_history, name='adoption_history'),
