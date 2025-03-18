@@ -21,8 +21,8 @@ class AdoptPetInfo(models.Model):
                                              ('4', '4'), ('5', '5')],
                                     default='0'
                                     )
-    experience_with_pets = models.TextField(blank=True, null=True)
-    reason_for_adoption = models.TextField(blank=True, null=True)
+    experience_with_pets = models.TextField()
+    reason_for_adoption = models.TextField()
     pet_passport = models.CharField(max_length=50)
 
     created_at = models.DateTimeField(auto_now_add=True)
