@@ -1,14 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
-from posts.models import Pet, PetImage
+from posts.models import Pet, PetImage, PostPetInfo
 from accounts.models import User
 from .models import AdoptPetInfo, AdoptionReview
 from .forms import AdoptPetInfoForm
 
 # Create your views here.
 
-#@login_required
+@login_required
 def available_pets(request):
 
     pets = Pet.objects.filter(postpetinfo__status='Approved').distinct()
@@ -41,22 +41,25 @@ def available_pets(request):
     return render(request, 'adoptions/available_pets.html', context)
 
 
+@login_required
 def pet_detail(request, pet_id):
 
     pet = get_object_or_404(Pet, pet_id=pet_id)
+    pet_info = PostPetInfo.objects.get(pet_id=pet_id)
 
-    # 获取该宠物的所有关联图片
     images = pet.images.all()
     context = {
         'pet': pet,
         'images': images,
+        'pet_info': pet_info,
     }
     return render(request, 'adoptions/pet_detail.html', context)
 
 
+@login_required
 def apply_for_adoption(request, pet_id):
-    username = request.session.get('username', request.user.username)
-    user = get_object_or_404(User, username=username)
+    username = request.user.username
+    user = User.objects.get(username=username)
     pet = get_object_or_404(Pet, pet_id=pet_id)
 
     if request.method == "POST":
@@ -64,25 +67,41 @@ def apply_for_adoption(request, pet_id):
 
         if current_application is None:
             form = AdoptPetInfoForm(request.POST)
+
             if form.is_valid():
                 adopt_info = form.save(commit=False)
 
                 adopt_info.pet = pet
+
                 adopt_info.user = request.user
-                # 这里暂时用当前用户作为操作员
-                adopt_info.operator = request.user
+
+                random_operator = User.objects.filter(user_type='Admin').order_by('?').first()
+                if not random_operator:
+                    raise Exception("No Operator found.")
+                adopt_info.operator = random_operator
+
                 adopt_info.save()
 
-                return redirect('adoptions:adoption_approval_status')
-            else:
-                messages.error(request, "请先完成当前的申请！")
+                review = AdoptionReview(
+                    pet=pet,
+                    adopter_username=request.user,
+                    operator_username = random_operator,
+                    status='Pending'
+                )
+                review.save()
+
                 return redirect('adoptions:my_application')
+            else:
+                messages.error(request, "Please complete the current application first！")
+                return redirect('adoptions:my_application')
+
+    if request.method == "GET":
+        form = AdoptPetInfoForm()
+        return render(request, 'adoptions/apply_for_adoption.html', {'form': form, 'pet': pet, 'user':user})
     return redirect('adoptions:available_pets')
 
 
-
-
-
+@login_required
 def my_application(request):
     username = request.user.username
 
@@ -95,7 +114,7 @@ def my_application(request):
     return render(request, 'adoptions/my_application.html', context)
 
 
-
+@login_required
 def adoption_history(request):
     username = request.user.username
 
