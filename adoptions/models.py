@@ -14,11 +14,15 @@ class AdoptPetInfo(models.Model):
     home_type = models.CharField(max_length=50)
     home_ownership = models.CharField(max_length=50)
     has_landlord_permission = models.BooleanField(default=False)
-    has_other_pets = models.BooleanField(default=False)
-    has_children = models.BooleanField(default=False)
-    experience_with_pets = models.BooleanField(default=False)
-    reason_for_adoption = models.CharField(max_length=200)
-    vaccinated = models.BooleanField(default=False)
+    has_other_pets = models.TextField(blank=True, null=True)
+    has_children = models.CharField(max_length=10,
+                                    choices=[('0', '0'), ('1', '1'),
+                                             ('2', '2'), ('3', '3'),
+                                             ('4', '4'), ('5', '5')],
+                                    default='0'
+                                    )
+    experience_with_pets = models.TextField(blank=True, null=True)
+    reason_for_adoption = models.TextField(blank=True, null=True)
     pet_passport = models.CharField(max_length=50)
 
     created_at = models.DateTimeField(auto_now_add=True)
