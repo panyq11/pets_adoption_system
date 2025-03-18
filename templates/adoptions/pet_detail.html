@@ -52,19 +52,21 @@
   <h5>My Details</h5>
   <ul class="list-unstyled">
     <li><strong>Vaccination Status:</strong>
-      {% if pet.vaccinated %}
-        Vaccinated
-      {% else %}
-        Not Vaccinated
-      {% endif %}
+        {% if pet_info.vaccinated == 'Yes' %}
+            Vaccinated
+        {% else %}
+            Not Vaccinated
+        {% endif %}
     </li>
-    <li><strong>Preferences:</strong>
-      {% if pet.preferences %}
-        {{ pet.preferences }}
-      {% else %}
-        With Kids, With Other Pets
-      {% endif %}
+
+    <li><strong>Experience with pets:</strong>
+        {{  pet_info.experience_with_pets }}
     </li>
+
+    <li><strong>Experience with kids:</strong>
+        {{pet_info.has_children }} friend(s)
+    </li>
+
   </ul>
   <div class="mt-4">
     <a href="{% url 'adoptions:apply_for_adoption' pet_id=pet.pet_id %}" class="btn btn-orange">Apply For Adoption</a>
