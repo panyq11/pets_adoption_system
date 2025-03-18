@@ -104,10 +104,11 @@ def apply_for_adoption(request, pet_id):
 @login_required
 def my_application(request):
     username = request.user.username
-
+    application = AdoptPetInfo.objects.get(user__username=username)
     review = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
 
     context = {
+        'application': application,
         'review': review,
     }
 
@@ -124,3 +125,15 @@ def adoption_history(request):
         'history_list': history_list,
     }
     return render(request, 'adoptions/adoption_history.html', context)
+
+def history_details(request, pet_id):
+
+    application = AdoptPetInfo.objects.get(pet__pet_id=pet_id)
+    review = AdoptionReview.objects.get(pet__pet_id=pet_id)
+
+    context = {
+        'application': application,
+        'review': review,
+    }
+
+    return render(request, 'adoptions/history_details.html', context)
