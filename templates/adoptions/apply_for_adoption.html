@@ -1,33 +1,46 @@
 {% extends 'adoptions/base.html' %}
+{% load static %}
 {% block content %}
-<div class="container mt-4">
-  <h2>Apply for Adoption: {{ pet.name }}</h2>
-  <hr>
-  <form id="adoptionForm" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button id="submitBtn" type="submit" class="btn btn-orange" disabled>Submit Application</button>
-  </form>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <h2 class="mb-4">Apply for Adoption: {{ pet.name }}</h2>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form id="adoptionForm" method="post" class="p-4 border rounded bg-light">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <div class="d-grid mt-3">
+          <button id="submitBtn" type="submit" class="btn btn-orange" disabled>Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
-    const form = document.getElementById("adoptionForm");
-    const submitBtn = document.getElementById("submitBtn");
 
-    function checkFormValidity() {
+  document.addEventListener("DOMContentLoaded", function(){
+      const form = document.getElementById("adoptionForm");
+      const submitBtn = document.getElementById("submitBtn");
 
-        if(form.checkValidity()){
-            submitBtn.disabled = false;
-        } else {
-            submitBtn.disabled = true;
-        }
-    }
+      function checkFormValidity() {
+
+          if (form.checkValidity()) {
+              submitBtn.disabled = false;
+          } else {
+              submitBtn.disabled = true;
+          }
+      }
 
 
-    form.addEventListener("input", checkFormValidity);
+      form.addEventListener("input", checkFormValidity);
 
-    checkFormValidity();
-});
+      checkFormValidity();
+  });
 </script>
 {% endblock %}
