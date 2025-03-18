@@ -11,7 +11,7 @@ from .forms import AdoptPetInfoForm
 @login_required
 def available_pets(request):
 
-    pets = Pet.objects.filter(postpetinfo__status='Approved').distinct()
+    pets = Pet.objects.filter(status='Available').distinct()
 
     search_query = request.GET.get('q', '').strip()
     pet_type = request.GET.get('pet_type', '').strip()
@@ -104,8 +104,8 @@ def apply_for_adoption(request, pet_id):
 @login_required
 def my_application(request):
     username = request.user.username
-    application = AdoptPetInfo.objects.get(user__username=username)
     review = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+    application = AdoptPetInfo.objects.filter(pet=review.pet).first()
 
     context = {
         'application': application,

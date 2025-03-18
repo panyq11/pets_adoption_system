@@ -22,19 +22,28 @@
         </p>
         <!-- 显示审核进度条 -->
         <div class="progress mb-3">
-          <div class="progress-bar" role="progressbar"
-               style="width: {% if review.status == 'Pending' %}33{% elif review.status == 'Approved' or review.status == 'Rejected' %}100{% endif %}%;"
-               aria-valuenow="{% if review.status == 'Pending' %}33{% else %}100{% endif %}"
-               aria-valuemin="0" aria-valuemax="100">
-            {% if review.status == 'Pending' %}
-              Pending
-            {% elif review.status == 'Approved' %}
-              Approved
-            {% elif review.status == 'Rejected' %}
-              Rejected
-            {% endif %}
-          </div>
-        </div>
+  <div class="progress-bar
+    {% if review.status == 'Approved' %}
+      bg-success
+    {% elif review.status == 'Rejected' %}
+      bg-danger
+    {% else %}
+      bg-warning
+    {% endif %}"
+       role="progressbar"
+       style="width: {% if review.status == 'Pending' %}33{% elif review.status == 'Approved' or review.status == 'Rejected' %}100{% endif %}%;"
+       aria-valuenow="{% if review.status == 'Pending' %}33{% else %}100{% endif %}"
+       aria-valuemin="0" aria-valuemax="100">
+    {% if review.status == 'Pending' %}
+      Pending
+    {% elif review.status == 'Approved' %}
+      Approved
+    {% elif review.status == 'Rejected' %}
+      Rejected
+    {% endif %}
+  </div>
+</div>
+
       </div>
     </div>
 
