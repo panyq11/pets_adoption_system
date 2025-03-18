@@ -27,7 +27,7 @@
         </td>
         <td>{{ history.get_status_display }}</td>
         <td>
-          <a href="{% url 'pet_detail' history.pet.id %}" class="btn btn-primary btn-sm">View Details</a>
+          <a href="{% url 'adoptions:pet_detail' pet_id=history.pet.pet_id %}" class="btn btn-primary btn-sm">View Details</a>
         </td>
       </tr>
       {% empty %}
