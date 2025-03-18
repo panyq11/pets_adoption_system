@@ -3,12 +3,31 @@
 <div class="container mt-4">
   <h2>Apply for Adoption: {{ pet.name }}</h2>
   <hr>
-  <form method="post">
+  <form id="adoptionForm" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-orange">Submit Application</button>
+    <button id="submitBtn" type="submit" class="btn btn-orange" disabled>Submit Application</button>
   </form>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const form = document.getElementById("adoptionForm");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function checkFormValidity() {
+
+        if(form.checkValidity()){
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+
+
+    form.addEventListener("input", checkFormValidity);
+
+    checkFormValidity();
+});
+</script>
 {% endblock %}
-
-
