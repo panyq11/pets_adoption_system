@@ -82,3 +82,28 @@ class LoginForm(forms.Form):
 
         return cleaned_data
 
+class UserProfileForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        required=False,  # 允许不填密码
+        label="New Password"
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'phone_no', 'address', 'birthday', 'user_image', 'password']
+        widgets = {
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get('password')
+
+        if password:  # 仅当用户输入了新密码才更新
+            user.set_password(password)
+
+        if commit:
+            user.save()
+        return user
+
