@@ -157,7 +157,7 @@
           </div>
 
           <!-- 用户信息表单 -->
-         <form id="profileForm">
+         <form id="profileForm" enctype="multipart/form-data">
              {% csrf_token %}
           <div class="info-item">
             <label for="usernameInput">Username:</label>
@@ -183,15 +183,15 @@
           </div>
           <div class="info-item">
             <label for="birthdayInput">Birthday:</label>
-            <input type="text" id="birthdayInput" class="form-control" placeholder="Select your birthday"
-            onfocus="this.type='date'; this.removeAttribute('placeholder');"
-            onblur="checkDateInput(this);" disabled>
+            <input type="text" id="birthdayInput" name="birthday" class="form-control" placeholder="Select your birthday"
+                   onfocus="this.type='date'; this.removeAttribute('placeholder');"
+                   onblur="checkDateInput(this);" disabled>
           </div>
           <script>
             function checkDateInput(input) {
                 if (!input.value) {
                  input.type = 'text'; // 恢复为文本类型，防止默认格式出现
-                    input.setAttribute('placeholder', 'Select your birthday'); // 恢复占位符
+                 input.setAttribute('placeholder', 'Select your birthday'); // 恢复占位符
                 }
             }
             </script>
@@ -199,7 +199,7 @@
           <div class="info-item">
             <label for="passwordInput">Password:</label>
             <div class="input-group">
-              <input type="password" id="passwordInput" class="form-control" value="password123" disabled>
+              <input type="password" id="passwordInput" name="password" class="form-control" value="123456" disabled>
               <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn" onclick="togglePassword()">
                 <i class="bi bi-eye"></i>
               </button>
@@ -234,7 +234,11 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+
+
     // 切换编辑模式
     function enableEdit() {
         document.getElementById('editBtn').classList.add('d-none');
@@ -271,30 +275,27 @@
 
     // 保存编辑
     function saveChanges() {
-      // 关闭编辑状态
-    document.getElementById('editBtn').classList.remove('d-none');
-    document.getElementById('saveBtn').classList.add('d-none');
-    document.getElementById('cancelBtn').classList.add('d-none');
-
-    // 获取用户输入的修改内容
-    const email = document.getElementById('emailInput').value;
-    const phone = document.getElementById('phoneInput').value;
-    const address = document.getElementById('addressInput').value;
-    const birthday = document.getElementById('birthdayInput').value;
-    const password = document.getElementById('passwordInput').value;
 
     // 构造请求数据
     const formData = new FormData();
-    formData.append('email', email);
-    formData.append('phone_no', phone);
-    formData.append('address', address);
-    formData.append('birthday', birthday);
-    if (password !== '********') { // 只有当用户修改密码时才发送
+    formData.append('email', document.getElementById('emailInput').value);
+    formData.append('phone_no', document.getElementById('phoneInput').value);
+    formData.append('address', document.getElementById('addressInput').value);
+    formData.append('birthday', document.getElementById('birthdayInput').value);
+
+    const password = document.getElementById('passwordInput').value;
+    if (password !== "********") {
         formData.append('password', password);
     }
 
+    // 头像上传
+    const avatarFile = document.getElementById('avatarInput').files[0];
+    if (avatarFile) {
+        formData.append('avatar', avatarFile);
+    }
+
     // 发送 AJAX 请求保存数据
-    fetch('/update-profile/', {
+    fetch('/profile/', {
         method: 'POST',
         body: formData,
         headers: {
@@ -325,6 +326,23 @@
     document.querySelectorAll('#emailInput, #phoneInput, #addressInput, #birthdayInput, #passwordInput')
         .forEach(input => input.disabled = true);
     }
+
+    // 获取 CSRF 令牌函数
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
 
     // 更换头像预览
     function handleAvatarChange(event) {
