@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Dashboard</title>
   <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     :root {
       --primary-orange: #f9aa33;
@@ -31,6 +28,7 @@
       background-color: var(--primary-orange);
       border-color: var(--primary-orange);
       color: #fff;
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
     }
     .btn-orange:hover {
       background-color: #e5941f;
@@ -41,6 +39,13 @@
       background-color: #cc8c2a;
       border-color: #cc8c2a;
       color: #fff;
+    }
+    /* 搜索按钮专用样式 */
+    .btn-search {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 20px;
+      margin-left: 15px; /* 增加左边距，使按钮离搜索框更远 */
     }
     /* 左侧导航栏 */
     .sidebar {
@@ -72,11 +77,11 @@
       transition: color 0.2s ease-in-out;
     }
     .sidebar .nav-item a.active {
-      color: var(--primary-orange);
+      color: var(--primary-orange) !important;
       font-weight: bold;
     }
     .sidebar .nav-item a:hover {
-      color: var(--primary-orange);
+      color: var(--primary-orange) !important;
     }
     /* 顶部栏 */
     .topbar {
@@ -94,11 +99,17 @@
       gap: 10px;
     }
     .topbar .search-filter input[type="text"] {
+      margin-left: 20px; /* 搜索框左边距 */
       border: 1px solid var(--light-gray);
-      border-radius: 4px;
-      padding: 5px 10px;
+      border-radius: 20px; /* 圆润效果 */
+      padding: 6px 15px;   /* 调整内边距 */
       outline: none;
-      width: 200px;
+      width: 220px;
+      transition: all 0.3s ease;
+    }
+    .topbar .search-filter input[type="text"]:focus {
+      border-color: var(--primary-orange);
+      box-shadow: 0 0 8px rgba(249,170,51,0.5);
     }
     /* 管理员头像及下拉菜单 */
     .admin-dropdown {
@@ -235,8 +246,8 @@
   <div class="topbar">
     <div class="search-filter">
       <form method="GET" action="{% url 'admin_dashboard:admin_dashboard' %}">
-      <input type="text" id="searchInput" name="keyword" placeholder="Search for user or pet..." value="{{ request.GET.keyword|default:'' }}">
-      <button id="searchButton" type="submit" class="btn btn-orange">Search</button>
+        <input type="text" id="searchInput" name="keyword" placeholder="Search for user or pet..." value="{{ request.GET.keyword|default:'' }}">
+        <button id="searchButton" type="submit" class="btn btn-orange btn-search">Search</button>
       </form>
     </div>
     <div class="admin-dropdown">
@@ -276,22 +287,22 @@
               <td>{{ forloop.counter }}</td>
               <td>
                 {% if user.user_image %}
-                <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="avatar">
+                  <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="avatar">
                 {% else %}
-                <img src="https://via.placeholder.com/40" alt="No Image" class="avatar">
+                  <img src="https://via.placeholder.com/40" alt="No Image" class="avatar">
                 {% endif %}
               </td>
               <td>{{ user.username }}</td>
               <td>{{ user.email }}</td>
               <td>{{ user.phone_no }}</td>
               <td>{{ user.address }}</td>
-              <td>{{ user.birthday  }}</td>
-              <td>{{ user.date_joined|date:"j F Y, g:i A"}}</td>
-              <td>{{ user.last_login|date:"j F Y, g:i A"}}</td>
+              <td>{{ user.birthday }}</td>
+              <td>{{ user.date_joined|date:"j F Y, g:i A" }}</td>
+              <td>{{ user.last_login|date:"j F Y, g:i A" }}</td>
             </tr>
           {% empty %}
             <tr>
-                <td colspan="9">No registered users yet.</td>
+              <td colspan="9">No registered users yet.</td>
             </tr>
           {% endfor %}
           </tbody>
@@ -330,21 +341,45 @@
             {% for pet in pets_list_cats %}
               <tr>
                 <td>{{ forloop.counter }}</td>
-                <td><img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="pet-image"></td>
+                <td>
+                  {% with pet.images.all|first as first_image %}
+                    {% if first_image %}
+                      <img src="{{ first_image.pet_image.url }}" alt="{{ pet.name }}" class="pet-image">
+                    {% else %}
+                      <img src="https://via.placeholder.com/40" alt="No Image" class="pet-image">
+                    {% endif %}
+                  {% endwith %}
+                </td>
                 <td>{{ pet.name }}</td>
                 <td>{{ pet.sex }}</td>
                 <td>{{ pet.breed }}</td>
                 <td>{{ pet.age }}</td>
                 <td>{{ pet.weight }}</td>
                 <td>{{ pet.size }}</td>
-                <td>{{ pet.passport_number }}</td>
-                <td>{{ pet.vaccinated }}</td>
-                <td>{{ pet.created_at|date:"j F Y, g:i A"}}</td>
+                <td>
+                  {% with pet.postpetinfo_set.all|first as info %}
+                    {% if info %}
+                      {{ info.pet_passport }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td>
+                  {% with pet.postpetinfo_set.all|first as info %}
+                    {% if info %}
+                      {{ info.vaccinated }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td>{{ pet.created_at|date:"j F Y, g:i A" }}</td>
               </tr>
             {% empty %}
-            <tr>
+              <tr>
                 <td colspan="11">No cats available.</td>
-            </tr>
+              </tr>
             {% endfor %}
             </tbody>
           </table>
@@ -373,21 +408,45 @@
             {% for pet in pets_list_dogs %}
               <tr>
                 <td>{{ forloop.counter }}</td>
-                <td><img src="{{ pet.image.url }}" alt="{{ pet.name }}" class="pet-image"></td>
+                <td>
+                  {% with pet.images.all|first as first_image %}
+                    {% if first_image %}
+                      <img src="{{ first_image.pet_image.url }}" alt="{{ pet.name }}" class="pet-image">
+                    {% else %}
+                      <img src="https://via.placeholder.com/40" alt="No Image" class="pet-image">
+                    {% endif %}
+                  {% endwith %}
+                </td>
                 <td>{{ pet.name }}</td>
                 <td>{{ pet.sex }}</td>
                 <td>{{ pet.breed }}</td>
                 <td>{{ pet.age }}</td>
                 <td>{{ pet.weight }}</td>
                 <td>{{ pet.size }}</td>
-                <td>{{ pet.passport_number }}</td>
-                <td>{{ pet.vaccinated }}</td>
-                <td>{{ pet.created_at|date:"j F Y, g:i A"}}</td>
+                <td>
+                  {% with pet.postpetinfo_set.all|first as info %}
+                    {% if info %}
+                      {{ info.pet_passport }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td>
+                  {% with pet.postpetinfo_set.all|first as info %}
+                    {% if info %}
+                      {{ info.vaccinated }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td>{{ pet.created_at|date:"j F Y, g:i A" }}</td>
               </tr>
             {% empty %}
-            <tr>
-            <td colspan="11">No dogs available.</td>
-            </tr>
+              <tr>
+                <td colspan="11">No dogs available.</td>
+              </tr>
             {% endfor %}
             </tbody>
           </table>
@@ -466,7 +525,6 @@
               <th>Size</th>
               <th>Pet Passport</th>
               <th>Vaccinated</th>
-              <th>User Email</th>
               <th>Home Type</th>
               <th>Home Ownership</th>
               <th>Other Pets</th>
@@ -483,7 +541,15 @@
             {% for post in post_list %}
             <tr>
               <td>{{ forloop.counter }}</td>
-              <td><img src="{{ post.pet.image.url }}" alt="Pet" class="pet-image"></td>
+              <td>
+                {% with post.pet.images.all|first as first_image %}
+                  {% if first_image %}
+                    <img src="{{ first_image.pet_image.url }}" alt="Pet" class="pet-image">
+                  {% else %}
+                    <img src="https://via.placeholder.com/40" alt="No Image" class="pet-image">
+                  {% endif %}
+                {% endwith %}
+              </td>
               <td>{{ post.pet.name }}</td>
               <td>{{ post.pet.type }}</td>
               <td>{{ post.pet.sex }}</td>
@@ -493,7 +559,6 @@
               <td>{{ post.pet.size }}</td>
               <td>{{ post.pet_passport }}</td>
               <td>{{ post.vaccinated }}</td>
-              <td>{{ post.email }}</td>
               <td>{{ post.home_type }}</td>
               <td>{{ post.home_ownership }}</td>
               <td>{{ post.has_other_pets }}</td>
@@ -520,7 +585,7 @@
             </tr>
             {% empty %}
             <tr>
-              <td colspan="22" class="text-center">No posts pending review.</td>
+              <td colspan="20" class="text-center">No posts pending review.</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -563,18 +628,17 @@
       const keyword = urlParams.get("keyword");
       if (tab === "users") {
         document.getElementById("nav-users").click();
-        } else if (tab === "pets") {
+      } else if (tab === "pets") {
         document.getElementById("nav-pets").click();
-        }
+      }
 
-       // 监听搜索框清空，自动恢复默认视图
-        const searchInput = document.getElementById("searchInput");
-        searchInput.addEventListener("input", function() {
-            if (searchInput.value.trim() === "") {
-                window.location.href = window.location.pathname;  // 只保留原始 URL
-            }
-        });
-
+      // 监听搜索框清空，自动恢复默认视图
+      const searchInput = document.getElementById("searchInput");
+      searchInput.addEventListener("input", function() {
+          if (searchInput.value.trim() === "") {
+              window.location.href = window.location.pathname;  // 只保留原始 URL
+          }
+      });
 
       const messages = document.querySelectorAll('[data-message-tags]');
       messages.forEach(message => {
@@ -720,9 +784,6 @@
 
       // 在 Users 中搜索
       const usersRows = document.querySelectorAll("#users-tbody tr");
-      usersMatched = false;
-      usersSection.classList.add("hidden");
-      usersSection.classList.remove("hidden");
       for (let row of usersTbody.rows) {
         const rowText = row.textContent.toLowerCase();
         if (rowText.includes(keyword)) {
@@ -740,50 +801,49 @@
         return;
       }
 
+      // 在 Pets（猫和狗）中搜索
+      const catTbody = document.getElementById("cat-tbody");
+      const dogTbody = document.getElementById("dog-tbody");
 
-        // 在 Pets（猫和狗）中搜索
-        const catTbody = document.getElementById("cat-tbody");
-        const dogTbody = document.getElementById("dog-tbody");
+      let catMatches = 0;
+      let dogMatches = 0;
 
-        let catMatches = 0;
-        let dogMatches = 0;
-
-        for (let row of catTbody.rows) {
-            if (row.textContent.toLowerCase().includes(keyword)) {
-              row.style.display = "";
-              catMatches++;
-            } else {
-              row.style.display = "none";
-            }
-        }
-
-        for (let row of dogTbody.rows) {
-            if (row.textContent.toLowerCase().includes(keyword)) {
-              row.style.display = "";
-              dogMatches++;
-            } else {
-              row.style.display = "none";
-            }
-        }
-
-        if (catMatches > 0 || dogMatches > 0) {
-          removeActiveFromNav();
-          navPets.classList.add("active");
-          hideAllMainSections();
-          petsSection.classList.remove("hidden");
-          // 激活有匹配的子导航（若猫和狗都有，则默认激活猫）
-          if (catMatches > 0) {
-            petCat.classList.add("active");
-            petDog.classList.remove("active");
-            catSection.classList.remove("hidden");
-            dogSection.classList.add("hidden");
-          } else if (dogMatches > 0) {
-            petDog.classList.add("active");
-            petCat.classList.remove("active");
-            dogSection.classList.remove("hidden");
-            catSection.classList.add("hidden");
+      for (let row of catTbody.rows) {
+          if (row.textContent.toLowerCase().includes(keyword)) {
+            row.style.display = "";
+            catMatches++;
+          } else {
+            row.style.display = "none";
           }
-          return;
+      }
+
+      for (let row of dogTbody.rows) {
+          if (row.textContent.toLowerCase().includes(keyword)) {
+            row.style.display = "";
+            dogMatches++;
+          } else {
+            row.style.display = "none";
+          }
+      }
+
+      if (catMatches > 0 || dogMatches > 0) {
+        removeActiveFromNav();
+        navPets.classList.add("active");
+        hideAllMainSections();
+        petsSection.classList.remove("hidden");
+        // 激活有匹配的子导航（若猫和狗都有，则默认激活猫）
+        if (catMatches > 0) {
+          petCat.classList.add("active");
+          petDog.classList.remove("active");
+          catSection.classList.remove("hidden");
+          dogSection.classList.add("hidden");
+        } else if (dogMatches > 0) {
+          petDog.classList.add("active");
+          petCat.classList.remove("active");
+          dogSection.classList.remove("hidden");
+          catSection.classList.add("hidden");
+        }
+        return;
       }
 
       if (!foundInUsers && catMatches === 0 && dogMatches === 0) {
