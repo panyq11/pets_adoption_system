@@ -108,6 +108,19 @@
   </div>
 </nav>
 
+<!-- 消息显示区域 -->
+  {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="color: red;">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
 <!-- 主体内容 -->
 <main class="my-4">
   {% block content %}
