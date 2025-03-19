@@ -50,6 +50,6 @@ class AdoptionReview(models.Model):
         default='Pending'
     )  # 审核状态
     applied_at = models.DateTimeField(auto_now_add=True)
-
+    review_time = models.DateTimeField(null=True, blank=True)  # 确认这里
     def __str__(self):
         return f"Adoption Review for {self.pet.name} by {self.adopter_username.username} - {self.status}"

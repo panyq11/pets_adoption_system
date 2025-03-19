@@ -105,7 +105,13 @@ def apply_for_adoption(request, pet_id):
 @login_required
 def my_application(request):
     username = request.user.username
-    review = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+    # 查询最新的 AdoptionReview，而不是只查询 Pending 状态的
+    review = AdoptionReview.objects.filter(adopter_username__username=username).order_by('-applied_at').first()
+
+    if review is None:
+        messages.error(request, "You do not have any adoption applications.")
+        return redirect('adoptions:available_pets')  # 或者重定向到其他页面
+        # 依然尝试获取 application，但不强制它必须存在
     application = AdoptPetInfo.objects.filter(pet=review.pet).first()
 
     context = {
