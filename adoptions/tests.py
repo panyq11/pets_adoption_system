@@ -21,7 +21,7 @@ class AdoptionViewsTest(TestCase):
         self.pet = Pet.objects.create(
             name='Buddy',
             sex='Male',
-            age='Young',  # 年龄为 'Young' 或 'Adult'
+            age='Young',
             weight=15.0,
             breed='Golden Retriever',
             size='Large',

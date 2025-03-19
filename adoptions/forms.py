@@ -14,5 +14,4 @@ class AdoptPetInfoForm(forms.ModelForm):
             'has_children',
             'experience_with_pets',
             'reason_for_adoption',
-            'pet_passport',
         ]

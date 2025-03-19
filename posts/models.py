@@ -91,7 +91,7 @@ class PostPetInfo(models.Model):
 
 class PostReview(models.Model):
     post_id = models.AutoField(primary_key=True)
-    pet_id = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="post_reviews")
     operator_username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_posts")
     date = models.DateTimeField(auto_now=True)
