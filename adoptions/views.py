@@ -5,13 +5,15 @@ from posts.models import Pet, PetImage, PostPetInfo
 from accounts.models import User
 from .models import AdoptPetInfo, AdoptionReview
 from .forms import AdoptPetInfoForm
+from django.contrib import messages
+
 
 # Create your views here.
 
 @login_required
 def available_pets(request):
 
-    pets = Pet.objects.filter(postpetinfo__status='Approved').distinct()
+    pets = Pet.objects.filter(status='Available').distinct()
 
     search_query = request.GET.get('q', '').strip()
     pet_type = request.GET.get('pet_type', '').strip()
@@ -62,38 +64,37 @@ def apply_for_adoption(request, pet_id):
     user = User.objects.get(username=username)
     pet = get_object_or_404(Pet, pet_id=pet_id)
 
+    current_application = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+
     if request.method == "POST":
-        current_application = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+        if current_application is not None:
+            messages.error(request,"You already have a pending adoption application. Please wait until it is processed before submitting a new one.")
+            return redirect('adoptions:my_application')
+        form = AdoptPetInfoForm(request.POST)
 
-        if current_application is None:
-            form = AdoptPetInfoForm(request.POST)
+        if form.is_valid():
+            adopt_info = form.save(commit=False)
 
-            if form.is_valid():
-                adopt_info = form.save(commit=False)
+            adopt_info.pet = pet
 
-                adopt_info.pet = pet
+            adopt_info.user = request.user
 
-                adopt_info.user = request.user
+            random_operator = User.objects.filter(user_type='Admin').order_by('?').first()
+            if not random_operator:
+                raise Exception("No Operator found.")
+            adopt_info.operator = random_operator
 
-                random_operator = User.objects.filter(user_type='Admin').order_by('?').first()
-                if not random_operator:
-                    raise Exception("No Operator found.")
-                adopt_info.operator = random_operator
+            adopt_info.save()
 
-                adopt_info.save()
+            review = AdoptionReview(
+                pet=pet,
+                adopter_username=request.user,
+                operator_username=random_operator,
+                status='Pending'
+            )
+            review.save()
 
-                review = AdoptionReview(
-                    pet=pet,
-                    adopter_username=request.user,
-                    operator_username = random_operator,
-                    status='Pending'
-                )
-                review.save()
-
-                return redirect('adoptions:my_application')
-            else:
-                messages.error(request, "Please complete the current application first！")
-                return redirect('adoptions:my_application')
+            return redirect('adoptions:my_application')
 
     if request.method == "GET":
         form = AdoptPetInfoForm()
@@ -104,10 +105,11 @@ def apply_for_adoption(request, pet_id):
 @login_required
 def my_application(request):
     username = request.user.username
-
     review = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+    application = AdoptPetInfo.objects.filter(pet=review.pet).first()
 
     context = {
+        'application': application,
         'review': review,
     }
 
@@ -124,3 +126,15 @@ def adoption_history(request):
         'history_list': history_list,
     }
     return render(request, 'adoptions/adoption_history.html', context)
+
+def history_details(request, pet_id):
+
+    application = AdoptPetInfo.objects.get(pet__pet_id=pet_id)
+    review = AdoptionReview.objects.get(pet__pet_id=pet_id)
+
+    context = {
+        'application': application,
+        'review': review,
+    }
+
+    return render(request, 'adoptions/history_details.html', context)

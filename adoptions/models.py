@@ -44,4 +44,4 @@ class AdoptionReview(models.Model):
     applied_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Adoption Review for {self.pet.name} by {self.adopter.username} - {self.status}"
+        return f"Adoption Review for {self.pet.name} by {self.adopter_username.username} - {self.status}"
