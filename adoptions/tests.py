@@ -12,12 +12,12 @@ User = get_user_model()
 
 class AdoptionViewsTest(TestCase):
     def setUp(self):
-        # 创建普通用户和管理员用户
+        # Create a normal user and an admin user
         self.user = User.objects.create_user(username='testuser', password='testpass', email='testuser@example.com')
         self.operator = User.objects.create_user(username='operator', password='operatorpass',
                                                  email='operator@example.com', user_type='Admin')
 
-        # 创建一个测试宠物记录
+        # Create a test pet record
         self.pet = Pet.objects.create(
             name='Buddy',
             sex='Male',
@@ -26,11 +26,12 @@ class AdoptionViewsTest(TestCase):
             breed='Golden Retriever',
             size='Large',
             status='Available',
-            posted_by=self.operator,  # 这里用 operator 作发布者
+            posted_by=self.operator,
+
             type='Dog'
         )
 
-        # 创建一个测试 PostPetInfo 记录，用于 pet_detail 视图展示宠物发布信息
+        # Create a test PostPetInfo record for the pet_detail view to display pet posting information
         self.post_pet_info = PostPetInfo.objects.create(
             pet=self.pet,
             user=self.user,
@@ -46,7 +47,7 @@ class AdoptionViewsTest(TestCase):
             status='Pending'
         )
 
-        # 创建一个 AdoptPetInfo 记录，作为已提交的领养申请
+        # Create an AdoptPetInfo record as a submitted adoption application
         self.adopt_pet_info = AdoptPetInfo.objects.create(
             pet=self.pet,
             user=self.user,
@@ -61,7 +62,7 @@ class AdoptionViewsTest(TestCase):
             pet_passport='Available'
         )
 
-        # 创建一个 AdoptionReview 记录，默认状态为 Pending
+        # Creates an AdoptionReview record with a default status of Pending
         self.adoption_review = AdoptionReview.objects.create(
             pet=self.pet,
             adopter_username=self.user,
@@ -69,19 +70,20 @@ class AdoptionViewsTest(TestCase):
             status='Pending'
         )
 
-        # 创建测试客户端并登录用户
         self.client = Client()
         self.client.login(username='testuser', password='testpass')
 
     def test_available_pets_view(self):
-        """测试 available_pets 视图返回状态码 200 和正确的宠物列表"""
+        """
+        Test that the available_pets view returns status code 200 and the correct list of pets
+        """
         url = reverse('adoptions:available_pets')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn(self.pet, response.context['pets'])
 
     def test_pet_detail_view(self):
-        """测试 pet_detail 视图返回正确的宠物和发布信息"""
+        """Testing that the pet_detail view returns the correct pet and release information"""
         url = reverse('adoptions:pet_detail', kwargs={'pet_id': self.pet.pet_id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

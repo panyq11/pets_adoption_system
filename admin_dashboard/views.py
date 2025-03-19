@@ -14,8 +14,8 @@ def admin_dashboard(request):
     """ 管理员主界面，包含多个管理功能 """
     keyword = request.GET.get('keyword', '').strip()
     tab = request.GET.get('tab', '')  # 获取 tab 值，避免重复计算
-    # 所有用户列表
-    users_list = User.objects.all().order_by('-date_joined')
+    # 用户列表
+    users_list = User.objects.exclude(user_type='Admin').order_by('-date_joined')
 
     # 所有宠物列表，并按照类型分类(cat/dog)
     pets_list_cats = Pet.objects.filter(

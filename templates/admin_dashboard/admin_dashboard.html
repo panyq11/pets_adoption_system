@@ -508,23 +508,27 @@
                   -
                 {% endif %}
               </td>
-              <td>
-              {% if review.adopt_review_id %}
-                <form method="POST" action="{% url 'admin_dashboard:update_adoption_status' review.adopt_review_id %}" class="approval-form d-flex flex-column align-items-center">
-                  {% csrf_token %}
-                  <select name="status" class="form-select form-select-sm" style="border-radius: 14px; width: auto;">
-                    <option value="Pending" {% if review.status == "Pending" %}selected{% endif %}>Pending</option>
-                    <option value="Approved" {% if review.status == "Approved" %}selected{% endif %}>Approved</option>
-                    <option value="Rejected" {% if review.status == "Rejected" %}selected{% endif %}>Rejected</option>
-                  </select>
-                  <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;">
-                    Update
-                  </button>
-                </form>
-              {% else %}
-                -
-              {% endif %}
-              </td>
+
+            <td>
+                {% if review.adopt_review_id %}
+                    <form method="POST" action="{% url 'admin_dashboard:update_adoption_status' review.adopt_review_id %}" class="approval-form d-flex flex-column align-items-center">
+                        {% csrf_token %}
+                        <select name="status" class="form-select form-select-sm" style="border-radius: 14px; width: auto;"
+                                {% if review.status == "Approved" or review.status == "Rejected" %}disabled{% endif %}>
+                            <option value="Pending" {% if review.status == "Pending" %}selected{% endif %}>Pending</option>
+                            <option value="Approved" {% if review.status == "Approved" %}selected{% endif %}>Approved</option>
+                            <option value="Rejected" {% if review.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                        </select>
+                        <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;"
+                                {% if review.status == "Approved" or review.status == "Rejected" %}disabled{% endif %}>
+                            Update
+                        </button>
+                    </form>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
             </tr>
           {% empty %}
             <tr>
@@ -598,18 +602,22 @@
               <td>{{ post.review_time|date:"j F Y, g:i A" }}</td>
               <td>Admin</td>
               <td>
-                <form method="POST" action="{% url 'admin_dashboard:update_post_status' post.post_info_id %}" class="d-flex flex-column align-items-center">
-                  {% csrf_token %}
-                  <select name="status" class="form-select form-select-sm" style="border-radius: 14px; width: auto;">
-                    <option value="Pending" {% if post.status == "Pending" %}selected{% endif %}>Pending</option>
-                    <option value="Approved" {% if post.status == "Approved" %}selected{% endif %}>Approved</option>
-                    <option value="Rejected" {% if post.status == "Rejected" %}selected{% endif %}>Rejected</option>
-                  </select>
-                  <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;">
-                    Update
-                  </button>
-                </form>
+
+                  <form method="POST" action="{% url 'admin_dashboard:update_post_status' post.post_info_id %}" class="d-flex flex-column align-items-center">
+                      {% csrf_token %}
+                      <select name="status" class="form-select form-select-sm" style="border-radius: 14px; width: auto;"
+                              {% if post.status == "Approved" or post.status == "Rejected" %}disabled{% endif %}>
+                          <option value="Pending" {% if post.status == "Pending" %}selected{% endif %}>Pending</option>
+                          <option value="Approved" {% if post.status == "Approved" %}selected{% endif %}>Approved</option>
+                          <option value="Rejected" {% if post.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                      </select>
+                      <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;"
+                              {% if post.status == "Approved" or post.status == "Rejected" %}disabled{% endif %}>
+                          Update
+                      </button>
+                  </form>
               </td>
+
             </tr>
             {% empty %}
             <tr>
@@ -691,7 +699,7 @@
         if (messageText.includes("adoption review updated successfully")) {
           var adoptionModal = new bootstrap.Modal(document.getElementById('adoptionStatusUpdateModal'));
           adoptionModal.show();
-        } else if (messageText.includes("post review updated successfully")) {
+        } else if (messageText.includes("pet status updated successfully")) {
           var postModal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
           postModal.show();
         }

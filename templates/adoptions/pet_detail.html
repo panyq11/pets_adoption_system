@@ -69,8 +69,17 @@
 
   </ul>
   <div class="mt-4">
+  {% if processing %}
+    <span class="btn btn-secondary disabled" style="cursor: not-allowed;">Apply For Adoption</span>
+    <p class="mt-2" style="color: #f38200;">
+      You already have a pending adoption application. Please wait until it is processed before submitting a new one.
+    </p>
+  {% else %}
     <a href="{% url 'adoptions:apply_for_adoption' pet_id=pet.pet_id %}" class="btn btn-orange">Apply For Adoption</a>
-  </div>
+  {% endif %}
+</div>
+
+
 </div>
   </div>
 </div>

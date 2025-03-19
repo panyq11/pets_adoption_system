@@ -45,15 +45,27 @@ def available_pets(request):
 
 @login_required
 def pet_detail(request, pet_id):
-
+    username = request.user.username
     pet = get_object_or_404(Pet, pet_id=pet_id)
     pet_info = PostPetInfo.objects.filter(pet_id=pet_id).first()
 
     images = pet.images.all()
+
+    processing = False
+    current_application = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+    if current_application is not None:
+        processing = True
+        """"
+        messages.error(request,
+                       "You already have a pending adoption application. Please wait until it is processed before submitting a new one.")
+        return redirect('adoptions:my_application')
+        """
+
     context = {
         'pet': pet,
         'images': images,
         'pet_info': pet_info,
+        'processing': processing,
     }
     return render(request, 'adoptions/pet_detail.html', context)
 
@@ -68,10 +80,11 @@ def apply_for_adoption(request, pet_id):
 
     if request.method == "POST":
         if current_application is not None:
-            messages.error(request,"You already have a pending adoption application. Please wait until it is processed before submitting a new one.")
+            messages.error(request,
+                           "You already have a pending adoption application. Please wait until it is processed before submitting a new one.")
             return redirect('adoptions:my_application')
-        form = AdoptPetInfoForm(request.POST)
 
+        form = AdoptPetInfoForm(request.POST)
         if form.is_valid():
             adopt_info = form.save(commit=False)
 
@@ -87,7 +100,6 @@ def apply_for_adoption(request, pet_id):
             adopt_info.save()
 
             review = AdoptionReview(
-                adopt_info = adopt_info,
                 pet=pet,
                 adopter_username=request.user,
                 operator_username=random_operator,
@@ -139,10 +151,15 @@ def adoption_history(request):
     return render(request, 'adoptions/adoption_history.html', context)
 
 def history_details(request, pet_id):
+    from django.db.models import Max
 
-    application = AdoptPetInfo.objects.get(pet__pet_id=pet_id)
-    review = AdoptionReview.objects.get(pet__pet_id=pet_id)
-    pet_info = PostPetInfo.objects.get(pet_id=pet_id)
+    application = AdoptPetInfo.objects.filter(pet__pet_id=pet_id) \
+        .annotate(latest_review_time=Max('reviews__review_time')) \
+        .order_by('-latest_review_time').first()
+
+    review = AdoptionReview.objects.filter(pet__pet_id=pet_id).order_by('-applied_at').first()
+
+    pet_info = PostPetInfo.objects.filter(pet_id=pet_id).filter(pet__pet_id=pet_id).first()
 
     context = {
         'application': application,

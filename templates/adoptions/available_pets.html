@@ -62,7 +62,7 @@
           <div class="card-body">
             <h5 class="card-title">{{ pet.name }}</h5>
             <p class="card-text">
-              {% if pet.breed %}{{ pet.breed }}, {% endif %} {{ pet.sex }}, {{ pet.age }} years old
+              {% if pet.breed %}{{ pet.breed }}, {% endif %} {{ pet.sex }}, {{ pet.age }}
             </p>
             <a href="{% url 'adoptions:pet_detail' pet_id=pet.pet_id %}" class="btn btn-orange">View Details</a>
           </div>
