@@ -1,5 +1,6 @@
 import os
 import django
+from django.utils import timezone
 
 # 配置 Django 环境
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pets_adoption_system.settings')
@@ -71,6 +72,7 @@ for pet_name in pet_list:
         pet_passport='Available',
         vaccinated='Yes',
         status='Approved',
+        review_time = timezone.now(),
     )
 
     post_review = PostReview.objects.create(
@@ -78,34 +80,45 @@ for pet_name in pet_list:
         username=user,         # 申请人
         operator_username=reviewer,  # 审核人（管理员）
         status='Pending'
+
     )
 
-    print(f"Test data for pet '{pet_name}' created successfully!")
+    print(f"{pet_name} created successfully!")
 
-    # 5. 创建 AdoptPetInfo（用户提交的领养申请记录）
-    adopt_info = AdoptPetInfo.objects.create(
-        pet=pet_instance,
-        user=user,
-        operator=reviewer,
-        home_type='Apartment',
-        home_ownership='Own',
-        has_landlord_permission=True,
-        has_other_pets='No other pets',
-        has_children='1',
-        experience_with_pets='I have experience with pets from my previous pet ownership.',
-        reason_for_adoption='I love animals and want to provide a loving home.',
-        pet_passport='Available'
-    )
+    status = 'pending'
+    if pet_name == "baolu" or pet_name == "guyu":
+        status = 'Approved'
+        pet_instance.status = 'Adopted'
+        pet_instance.save()
+    elif pet_name == "gancao":
+        status = 'Rejected'
 
-    # 6. 创建 AdoptionReview（领养申请审核记录）
-    adoption_review = AdoptionReview.objects.create(
-        pet=pet_instance,
-        adopter_username=user,
-        operator_username=reviewer,
-        status='Pending'
-    )
+    if pet_name not in "tuantuan":
+        adopt_info = AdoptPetInfo.objects.create(
+            pet=pet_instance,
+            user=user,
+            operator=reviewer,
+            home_type='Apartment',
+            home_ownership='Own',
+            has_landlord_permission=True,
+            has_other_pets='No other pets',
+            has_children='1',
+            experience_with_pets='I have experience with pets from my previous pet ownership.',
+            reason_for_adoption='I love animals and want to provide a loving home.',
+            pet_passport='Available'
+        )
 
-    print(f"Adoption data for pet '{pet_name}' created successfully!")
+        # 6. 创建 AdoptionReview（领养申请审核记录）
+        adoption_review = AdoptionReview.objects.create(
+            adopt_info=adopt_info,
+            pet=pet_instance,
+            adopter_username=user,
+            operator_username=reviewer,
+            status=status,
+            review_time=timezone.now(),
+        )
+
+        print(f"Adoption data for pet '{pet_name}' created successfully!")
 
 print("All test data created successfully!")
 

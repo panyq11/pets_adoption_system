@@ -95,11 +95,7 @@
             <h5>Pet Details</h5>
   <ul class="list-unstyled">
     <li><strong>Vaccination Status:</strong>
-        {% if pet_info.vaccinated == 'Yes' %}
-            Vaccinated
-        {% else %}
-            Not Vaccinated
-        {% endif %}
+        {{ pet_info.vaccinated }}
     </li>
 
     <li><strong>Experience with pets:</strong>

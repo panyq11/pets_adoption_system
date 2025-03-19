@@ -79,7 +79,6 @@ class PostPetInfo(models.Model):
     )  # 📌 **审核状态**
 
     created_at = models.DateTimeField(auto_now_add=True)
-
     review_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

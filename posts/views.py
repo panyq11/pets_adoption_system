@@ -9,10 +9,12 @@ User = get_user_model()
 
 
 def my_posts(request):
-    # ✅ 只查询当前用户发布的宠物
-    user_pets = Pet.objects.filter(posted_by=request.user).order_by('-created_at')
+    approved_posts = PostPetInfo.objects.select_related('pet').filter(
+        user=request.user,
+        status='Approved'
+    ).order_by('-created_at')
 
-    context = {'pet_list': user_pets}
+    context = {'approved_posts': approved_posts}
     return render(request, 'posts/myPosts.html', context)
 
 

@@ -1,0 +1,54 @@
+{% extends 'adoptions/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Adoption Approval Status</h2>
+  <hr>
+
+  <!-- 如果是单个申请的详细状态，也可只展示一个卡片 -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Application #{{ adopt_info_id }}</h5>
+      <p class="card-text">Pet: Cindy</p>
+      <p class="card-text">Current Status: <strong>Processing</strong></p>
+      <p class="card-text">Submitted on: 2025-03-05 14:15</p>
+      <!-- 如果想展示历史状态变更，可加表格或列表 -->
+      <hr>
+      <h6>Status Timeline</h6>
+      <ul>
+        <li>2025-03-05 14:15 - Submitted</li>
+        <li>2025-03-06 09:00 - Processing</li>
+        <!-- 如果后续有变更再添加 -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- 如果想展示所有申请的状态，也可以做成一个列表或表格 -->
+  <!-- 示例： -->
+  <h4>All Applications Status</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Application ID</th>
+        <th>Pet</th>
+        <th>Current Status</th>
+        <th>Last Update</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 示例静态数据 -->
+      <tr>
+        <td>1</td>
+        <td>Cindy</td>
+        <td>Approved</td>
+        <td>2025-03-07 15:20</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>DianDian</td>
+        <td>Processing</td>
+        <td>2025-03-08 10:00</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

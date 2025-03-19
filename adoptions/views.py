@@ -47,7 +47,7 @@ def available_pets(request):
 def pet_detail(request, pet_id):
 
     pet = get_object_or_404(Pet, pet_id=pet_id)
-    pet_info = PostPetInfo.objects.get(pet_id=pet_id)
+    pet_info = PostPetInfo.objects.filter(pet_id=pet_id).first()
 
     images = pet.images.all()
     context = {
@@ -87,6 +87,7 @@ def apply_for_adoption(request, pet_id):
             adopt_info.save()
 
             review = AdoptionReview(
+                adopt_info = adopt_info,
                 pet=pet,
                 adopter_username=request.user,
                 operator_username=random_operator,
@@ -105,12 +106,22 @@ def apply_for_adoption(request, pet_id):
 @login_required
 def my_application(request):
     username = request.user.username
-    review = AdoptionReview.objects.filter(adopter_username__username=username, status='Pending').first()
+
+    review = AdoptionReview.objects.filter(adopter_username=request.user, status='Pending').first()
+
+    if review is None:
+        messages.error(request, "You do not have any adoption applications.")
+        return redirect('adoptions:available_pets')
+
+    pet_id = review.pet_id
+    pet_info = PostPetInfo.objects.get(pet_id=pet_id)
+
     application = AdoptPetInfo.objects.filter(pet=review.pet).first()
 
     context = {
         'application': application,
         'review': review,
+        'pet_info': pet_info,
     }
 
     return render(request, 'adoptions/my_application.html', context)
@@ -131,10 +142,12 @@ def history_details(request, pet_id):
 
     application = AdoptPetInfo.objects.get(pet__pet_id=pet_id)
     review = AdoptionReview.objects.get(pet__pet_id=pet_id)
+    pet_info = PostPetInfo.objects.get(pet_id=pet_id)
 
     context = {
         'application': application,
         'review': review,
+        'pet_info':pet_info,
     }
 
     return render(request, 'adoptions/history_details.html', context)

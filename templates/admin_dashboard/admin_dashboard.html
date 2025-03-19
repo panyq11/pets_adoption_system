@@ -40,12 +40,12 @@
       border-color: #cc8c2a;
       color: #fff;
     }
-    /* 搜索按钮专用样式 */
+    /* 搜索按钮 */
     .btn-search {
       padding: 5px 10px;
       font-size: 12px;
       border-radius: 20px;
-      margin-left: 15px; /* 增加左边距，使按钮离搜索框更远 */
+      margin-left: 15px;
     }
     /* 左侧导航栏 */
     .sidebar {
@@ -99,10 +99,10 @@
       gap: 10px;
     }
     .topbar .search-filter input[type="text"] {
-      margin-left: 20px; /* 搜索框左边距 */
+      margin-left: 20px;
       border: 1px solid var(--light-gray);
-      border-radius: 20px; /* 圆润效果 */
-      padding: 6px 15px;   /* 调整内边距 */
+      border-radius: 20px;
+      padding: 6px 15px;
       outline: none;
       width: 220px;
       transition: all 0.3s ease;
@@ -111,49 +111,23 @@
       border-color: var(--primary-orange);
       box-shadow: 0 0 8px rgba(249,170,51,0.5);
     }
-    /* 管理员头像及下拉菜单 */
-    .admin-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    .admin-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
+    /* 欢迎文本，点击后触发注销模态 */
+    .welcome-text {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--primary-orange);
+      text-decoration: none;
       cursor: pointer;
     }
-    .admin-menu {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 45px;
-      background-color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      border: 1px solid var(--light-gray);
-      border-radius: 4px;
-      z-index: 100;
-    }
-    .admin-menu a, .admin-menu button {
-      display: block;
-      padding: 8px 12px;
-      text-decoration: none;
-      color: var(--text-dark);
-      transition: background-color 0.2s ease;
-      background: none;
-      border: none;
-      width: 100%;
-      text-align: left;
-    }
-    .admin-menu a:hover, .admin-menu button:hover {
-      background-color: var(--light-gray);
+    .welcome-text:hover {
+      text-decoration: underline;
     }
     /* 主内容区域 */
     .main-content {
       margin-left: 220px;
       padding: 20px;
     }
-    /* 滚动容器（横向和纵向滚动） */
+    /* 滚动容器 */
     .scroll-container {
       overflow-x: auto;
       overflow-y: auto;
@@ -251,12 +225,28 @@
       </form>
     </div>
     <div class="admin-dropdown">
-      <img src="https://via.placeholder.com/40?text=Admin" alt="Admin" class="admin-avatar" id="adminAvatar">
-      <div class="admin-menu" id="adminMenu">
-        <form action="{% url 'accounts:logout' %}" method="post">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-orange">Logout</button>
-        </form>
+      <!-- 显示欢迎文本，点击后触发注销模态窗口 -->
+      <a href="#" class="welcome-text" data-bs-toggle="modal" data-bs-target="#logoutModal">
+        Welcome, {{ request.user.username }}
+      </a>
+    </div>
+  </div>
+
+  <!-- 注销确认模态窗口 -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to logout?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="{% url 'accounts:logout' %}" class="btn btn-orange">Logout</a>
+        </div>
       </div>
     </div>
   </div>
@@ -313,12 +303,10 @@
     <!-- Pets 区域 -->
     <div id="pets-section" class="hidden">
       <h4>Pets</h4>
-      <!-- Pets 子导航（去掉 Add New） -->
       <div class="pet-sub-nav">
         <a href="#" id="pet-cat" class="active">Cat</a>
         <a href="#" id="pet-dog">Dog</a>
       </div>
-      <!-- Cat 列表 -->
       <div id="cat-section">
         <div class="scroll-container">
           <table class="table-custom">
@@ -385,7 +373,6 @@
           </table>
         </div>
       </div>
-      <!-- Dog 列表 -->
       <div id="dog-section" class="hidden">
         <div class="scroll-container">
           <table class="table-custom">
@@ -470,38 +457,80 @@
               <th>Children</th>
               <th>Experience</th>
               <th>Reason</th>
-              <th>Vaccinated</th>
-              <th>Pet Passport</th>
-              <th>Operator</th>
+              <th>Landlord Permission</th>
+              <th>Other Pets</th>
               <th>Submission Time</th>
               <th>Review Time</th>
+              <th>Operator</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody id="adoption-tbody">
+          {% for review in adoption_reviews %}
             <tr>
-              <td>1</td>
-              <td><img src="https://via.placeholder.com/40" alt="User" class="avatar"></td>
-              <td>Bob</td>
-              <td>Luna</td>
-              <td>House</td>
-              <td>Own</td>
-              <td>2</td>
-              <td>No</td>
-              <td>Companionship</td>
-              <td>No</td>
-              <td>D100001</td>
-              <td>OperatorB</td>
-              <td>2025-03-05 09:00</td>
-              <td>2025-03-06 16:30</td>
+              <td>{{ forloop.counter }}</td>
               <td>
-                <select class="status-select">
-                  <option value="Pending" selected>Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
+                  {% if review.adopter_username.user_image %}
+                      <img src="{{ review.adopter_username.user_image.url }}" alt="{{ review.adopter_username.username }}" class="avatar">
+                  {% else %}
+                      <img src="https://via.placeholder.com/40" alt="No Image" class="avatar">
+                  {% endif %}
+              </td>
+              <td>{{ review.adopter_username.username }}</td>
+              <td>{{ review.pet.name }}</td>
+              <td>{{ review.adopt_info.home_type |default:"-" }}</td>
+              <td>{{ review.adopt_info.home_ownership |default:"-" }}</td>
+              <td>{{ review.adopt_info.has_children |default:"-" }}</td>
+              <td>{{ review.adopt_info.experience_with_pets |default:"-" }}</td>
+              <td>{{ review.adopt_info.reason_for_adoption |default:"-" }}</td>
+              <td>
+                {% if review.adopt_info.has_landlord_permission %}
+                  Yes
+                {% else %}
+                  No
+                {% endif %}
+              </td>
+              <td>
+                  {{ review.adopt_info.has_other_pets }}
+              </td>
+              <td>{{ review.applied_at|date:"j F Y, g:i A" }}</td>
+              <td>
+                {% if review.review_time %}
+                  {{ review.review_time|date:"j F Y, g:i A" }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if review.operator_username %}
+                  {{ review.operator_username.username }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+              {% if review.adopt_review_id %}
+                <form method="POST" action="{% url 'admin_dashboard:update_adoption_status' review.adopt_review_id %}" class="approval-form d-flex flex-column align-items-center">
+                  {% csrf_token %}
+                  <select name="status" class="form-select form-select-sm" style="border-radius: 14px; width: auto;">
+                    <option value="Pending" {% if review.status == "Pending" %}selected{% endif %}>Pending</option>
+                    <option value="Approved" {% if review.status == "Approved" %}selected{% endif %}>Approved</option>
+                    <option value="Rejected" {% if review.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                  </select>
+                  <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;">
+                    Update
+                  </button>
+                </form>
+              {% else %}
+                -
+              {% endif %}
               </td>
             </tr>
+          {% empty %}
+            <tr>
+              <td colspan="17" class="text-center">No adoption reviews available.</td>
+            </tr>
+          {% endfor %}
           </tbody>
         </table>
       </div>
@@ -576,7 +605,6 @@
                     <option value="Approved" {% if post.status == "Approved" %}selected{% endif %}>Approved</option>
                     <option value="Rejected" {% if post.status == "Rejected" %}selected{% endif %}>Rejected</option>
                   </select>
-                  <!-- 与选择框之间留一点间距 -->
                   <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;">
                     Update
                   </button>
@@ -602,15 +630,32 @@
   </div>
   {% endif %}
 
-  <!-- Status Update Modal -->
+  <!-- Status Update Modal for Post Review -->
   <div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-labelledby="statusUpdateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Status Updated</h5>
+          <h5 class="modal-title" id="statusUpdateModalLabel">Status Updated</h5>
         </div>
         <div class="modal-body">
           The post review has been successfully updated.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-orange" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adoption Review Update Modal -->
+  <div class="modal fade" id="adoptionStatusUpdateModal" tabindex="-1" aria-labelledby="adoptionStatusUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="adoptionStatusUpdateModalLabel">Status Updated</h5>
+        </div>
+        <div class="modal-body">
+          The adoption review has been successfully updated.
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-orange" data-bs-dismiss="modal">Close</button>
@@ -635,16 +680,20 @@
       // 监听搜索框清空，自动恢复默认视图
       const searchInput = document.getElementById("searchInput");
       searchInput.addEventListener("input", function() {
-          if (searchInput.value.trim() === "") {
-              window.location.href = window.location.pathname;  // 只保留原始 URL
-          }
+        if (searchInput.value.trim() === "") {
+          window.location.href = window.location.pathname;
+        }
       });
 
       const messages = document.querySelectorAll('[data-message-tags]');
       messages.forEach(message => {
-        if (message.getAttribute('data-message-tags').includes("success")) {
-          var statusModal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
-          statusModal.show();
+        const messageText = message.textContent.trim().toLowerCase();
+        if (messageText.includes("adoption review updated successfully")) {
+          var adoptionModal = new bootstrap.Modal(document.getElementById('adoptionStatusUpdateModal'));
+          adoptionModal.show();
+        } else if (messageText.includes("post review updated successfully")) {
+          var postModal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
+          postModal.show();
         }
       });
     });
@@ -652,7 +701,6 @@
 
   <script>
     const usersTbody = document.getElementById("users-tbody");
-    // 主导航切换：Users, Pets, Adoption Review, Post Review
     const navUsers = document.getElementById("nav-users");
     const navPets = document.getElementById("nav-pets");
     const navAdoption = document.getElementById("nav-adoption");
@@ -681,7 +729,6 @@
       navUsers.classList.add("active");
       hideAllMainSections();
       usersSection.classList.remove("hidden");
-      // 重置 Users 表格过滤
       resetTableFilter("users-tbody");
     });
     navPets.addEventListener("click", e => {
@@ -690,7 +737,6 @@
       navPets.classList.add("active");
       hideAllMainSections();
       petsSection.classList.remove("hidden");
-      // 重置 Pets 表格过滤（猫和狗）
       resetTableFilter("cat-tbody");
       resetTableFilter("dog-tbody");
     });
@@ -709,10 +755,8 @@
       postreviewSection.classList.remove("hidden");
     });
 
-    // Pets 子导航切换：Cat, Dog
     const petCat = document.getElementById("pet-cat");
     const petDog = document.getElementById("pet-dog");
-
     const catSection = document.getElementById("cat-section");
     const dogSection = document.getElementById("dog-section");
 
@@ -730,7 +774,6 @@
       petCat.classList.add("active");
       hideAllPetSubSections();
       catSection.classList.remove("hidden");
-      // 重置猫表格过滤
       resetTableFilter("cat-tbody");
     });
     petDog.addEventListener("click", e => {
@@ -739,22 +782,9 @@
       petDog.classList.add("active");
       hideAllPetSubSections();
       dogSection.classList.remove("hidden");
-      // 重置狗表格过滤
       resetTableFilter("dog-tbody");
     });
 
-    // 管理员头像下拉菜单
-    const adminAvatar = document.getElementById("adminAvatar");
-    const adminMenu = document.getElementById("adminMenu");
-    adminAvatar.addEventListener("click", (e) => {
-      e.stopPropagation();
-      adminMenu.style.display = adminMenu.style.display === "block" ? "none" : "block";
-    });
-    document.addEventListener("click", () => {
-      adminMenu.style.display = "none";
-    });
-
-    // 搜索功能
     const searchInput = document.getElementById("searchInput");
     const searchButton = document.getElementById("searchButton");
 
@@ -771,18 +801,14 @@
     searchButton.addEventListener("click", () => {
       const keyword = searchInput.value.toLowerCase().trim();
       if (keyword === "") {
-        // 若搜索为空，重置 Users 与 Pets 表格
         resetTableFilter("users-tbody");
         resetTableFilter("cat-tbody");
         resetTableFilter("dog-tbody");
         return;
       }
-
       let foundInUsers = false;
       let foundInCats = false;
       let foundInDogs = false;
-
-      // 在 Users 中搜索
       const usersRows = document.querySelectorAll("#users-tbody tr");
       for (let row of usersTbody.rows) {
         const rowText = row.textContent.toLowerCase();
@@ -800,38 +826,31 @@
         usersSection.classList.remove("hidden");
         return;
       }
-
-      // 在 Pets（猫和狗）中搜索
       const catTbody = document.getElementById("cat-tbody");
       const dogTbody = document.getElementById("dog-tbody");
-
       let catMatches = 0;
       let dogMatches = 0;
-
       for (let row of catTbody.rows) {
-          if (row.textContent.toLowerCase().includes(keyword)) {
-            row.style.display = "";
-            catMatches++;
-          } else {
-            row.style.display = "none";
-          }
+        if (row.textContent.toLowerCase().includes(keyword)) {
+          row.style.display = "";
+          catMatches++;
+        } else {
+          row.style.display = "none";
+        }
       }
-
       for (let row of dogTbody.rows) {
-          if (row.textContent.toLowerCase().includes(keyword)) {
-            row.style.display = "";
-            dogMatches++;
-          } else {
-            row.style.display = "none";
-          }
+        if (row.textContent.toLowerCase().includes(keyword)) {
+          row.style.display = "";
+          dogMatches++;
+        } else {
+          row.style.display = "none";
+        }
       }
-
       if (catMatches > 0 || dogMatches > 0) {
         removeActiveFromNav();
         navPets.classList.add("active");
         hideAllMainSections();
         petsSection.classList.remove("hidden");
-        // 激活有匹配的子导航（若猫和狗都有，则默认激活猫）
         if (catMatches > 0) {
           petCat.classList.add("active");
           petDog.classList.remove("active");
@@ -845,13 +864,10 @@
         }
         return;
       }
-
       if (!foundInUsers && catMatches === 0 && dogMatches === 0) {
         alert("No matching results found.");
       }
     });
-
-    // 可选：当搜索框清空时重置过滤
     searchInput.addEventListener("input", () => {
       if (searchInput.value.trim() === "") {
         resetTableFilter("users-tbody");

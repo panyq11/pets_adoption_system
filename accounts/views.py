@@ -6,6 +6,13 @@ from django.contrib.auth import get_user_model, login, logout
 User = get_user_model()
 from .forms import UserProfileForm
 from django.contrib import messages
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import update_session_auth_hash
+import datetime
+
+
 
 @require_http_methods(['GET', 'POST'])
 def register(request):
@@ -80,20 +87,47 @@ def logout_view(request):
     return redirect(reverse("accounts:yfLogin"))
 
 
-
+@csrf_exempt
+@login_required
 def profile(request):
-    user = request.user  # 当前用户
-    if request.method == 'POST':
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=user)
-        if profile_form.is_valid():
-            profile_form.save()
-            login(request, user)  # 重新登录，确保密码更新后不会登出
-            messages.success(request, "Profile updated successfully!")
-            return redirect('profile')
-    else:
-        profile_form = UserProfileForm(instance=user)
+    user = request.user
 
-    return render(request, 'accounts/Profile.html', {'profile_form': profile_form})
+    if request.method == 'GET':
+        # 返回HTML
+        return render(request, 'accounts/Profile.html', {
+            'user': user,
+            # 你还可以传别的 context
+        })
+
+    elif request.method == 'POST':
+        # 处理更新
+        user.email = request.POST.get('email', user.email)
+        user.phone_no = request.POST.get('phone_no', user.phone_no)
+        user.address = request.POST.get('address', user.address)
+
+        birthday_str = request.POST.get('birthday', '')
+        if birthday_str:
+            try:
+                # 假设前端日期格式是 "YYYY-MM-DD"
+                user.birthday = datetime.datetime.strptime(birthday_str, '%Y-%m-%d').date()
+            except ValueError:
+                # 如果转换失败，保留原值或根据需要处理错误
+                messages.error(request, "Invalid birthday format.")
+
+        new_password = request.POST.get('password', '')
+        if new_password and new_password != "********":
+            user.set_password(new_password)
+            # 更新会话认证，防止修改密码后用户被登出
+            update_session_auth_hash(request, user)
+        # 处理头像上传（字段名称为 'avatar'）
+        if 'avatar' in request.FILES:
+            user.user_image = request.FILES['avatar']
+        user.save()
+        # 返回 JSON 响应，前端可以根据此响应做页面刷新或提示
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
 
 
 def admin_dashboard(request):

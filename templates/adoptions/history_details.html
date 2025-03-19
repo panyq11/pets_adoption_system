@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 <div class="container mt-4">
-  <h2>Pending Adoption Applications</h2>
+  <h2>Adoption History Details</h2>
   {% if review %}
     <!-- 审核信息卡片 -->
     <div class="card mb-4">
@@ -95,11 +95,8 @@
             <h5>Pet Details</h5>
   <ul class="list-unstyled">
     <li><strong>Vaccination Status:</strong>
-        {% if pet_info.vaccinated == 'Yes' %}
-            Vaccinated
-        {% else %}
-            Not Vaccinated
-        {% endif %}
+        {{ pet_info.vaccinated }}
+
     </li>
 
     <li><strong>Experience with pets:</strong>

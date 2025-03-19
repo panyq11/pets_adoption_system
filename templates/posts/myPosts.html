@@ -5,79 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Posts</title>
   <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     :root {
       --primary-orange: #f9aa33;       /* 项目主色 */
       --light-gray: #e0e0e0;
       --text-dark: #333;
-      /* 低饱和度状态色 */
-      --status-approved: #d9ead3;      /* 浅绿色 */
-      --status-pending: #fff2cc;       /* 浅黄色 */
-      --status-rejected: #f4cccc;      /* 浅红色 */
     }
     body {
       background-color: #fff;
       color: var(--text-dark);
-      /* 全局滚动条样式，滚动条出现在屏幕最右侧 */
     }
-    /* Global scrollbar styling for WebKit */
-    body::-webkit-scrollbar {
-      width: 8px;
-    }
-    body::-webkit-scrollbar-track {
-      background: var(--light-gray);
-    }
-    body::-webkit-scrollbar-thumb {
-      background-color: var(--primary-orange);
-      border-radius: 4px;
-    }
-    /* Firefox scrollbar styling */
-    body {
-      scrollbar-width: thin;
-      scrollbar-color: var(--primary-orange) var(--light-gray);
-    }
-    /* 导航栏 */
+    /* 导航栏样式 */
     .navbar-custom {
       background-color: #fff;
       border-bottom: 1px solid var(--light-gray);
     }
-    .navbar-brand,
-    .navbar-brand:link,
-    .navbar-brand:visited {
+    .navbar-custom .navbar-brand,
+    .navbar-custom .navbar-brand:link,
+    .navbar-custom .navbar-brand:visited {
       color: var(--primary-orange) !important;
       text-decoration: none;
       transition: color 0.2s ease-in-out;
     }
-    .navbar-brand:hover,
-    .navbar-brand:focus,
-    .navbar-brand:active {
-      color: #ccc !important;
+    .navbar-custom .navbar-brand:hover,
+    .navbar-custom .navbar-brand:focus,
+    .navbar-custom .navbar-brand:active {
+      color: var(--primary-orange) !important;
       text-decoration: none;
     }
-    .navbar-nav .nav-link {
-      color: #555 !important;
-      margin-left: 1rem;
-      transition: color 0.2s ease-in-out;
-    }
-    .navbar-nav .nav-link:hover {
+    /* 确保导航栏链接悬浮时变为橙色 */
+    .navbar-custom .nav-link:hover {
       color: var(--primary-orange) !important;
     }
-    .navbar-nav .nav-link.active {
+    /* 新增：当前 active 的 nav-link 显示为橙色 */
+    .navbar-custom .nav-link.active {
       color: var(--primary-orange) !important;
     }
     /* 卡片布局 */
     .pet-card {
-      position: relative;
+      margin-bottom: 20px;
       border: none;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       transition: transform 0.2s ease-in-out;
-      margin-bottom: 20px;
     }
     .pet-card:hover {
       transform: translateY(-3px);
@@ -87,50 +59,25 @@
       height: 220px;
       width: 100%;
     }
-    /* 状态徽章 */
-    .status-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 0.3rem 0.5rem;
-      font-size: 0.8rem;
-      border-radius: 0.5rem;
-      color: #333;
+    /* 统一风格的橙色按钮 */
+    .btn-orange {
+      background-color: var(--primary-orange);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
     }
-    .status-badge.approved {
-      background-color: var(--status-approved);
+    .btn-orange:hover {
+      background-color: #e2982c;
+      transform: scale(1.05);
     }
-    .status-badge.pending {
-      background-color: var(--status-pending);
+    .btn-orange:active {
+      background-color: #d48b27;
+      transform: scale(0.95);
     }
-    .status-badge.rejected {
-      background-color: var(--status-rejected);
-    }
-
-    /* 🟠 统一风格的橙色按钮 */
-.btn-orange {
-  background-color: var(--primary-orange); /* #F9AA33 */
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 6px;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-}
-
-/* 🟠 悬停 & 点击效果 */
-.btn-orange:hover {
-  background-color: #e2982c; /* 深一点的橙色 */
-  transform: scale(1.05);
-}
-
-.btn-orange:active {
-  background-color: #d48b27;
-  transform: scale(0.95);
-}
-
-
   </style>
 </head>
 <body>
@@ -162,32 +109,22 @@
   <div class="container mt-4">
     <h2 class="mb-4">My Posts</h2>
     <div class="row">
-      {# 以下使用 Django 模板语法实时展示宠物数据，确保后端传入 pet_list 数据 #}
-      {% for pet in pet_list %}
+      {% for post in approved_posts %}
       <div class="col-lg-4 col-md-6 col-sm-12">
         <div class="card pet-card">
-          <div class="status-badge {{ pet.status|lower }}">
-            {{ pet.status }}
-          </div>
-
-            <!-- ✅ 显示宠物的第一张图片 -->
-        {% with pet.images.all|first as first_image %}
-          {% if first_image %}
-            <img src="{{ first_image.pet_image.url }}" class="card-img-top" alt="{{ pet.name }}">
-          {% else %}
-            <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="{{ pet.name }}">
-          {% endif %}
-        {% endwith %}
-
+          {# 显示宠物的第一张图片，如果没有则使用默认图片 #}
+          {% with post.pet.images.all|first as first_image %}
+            {% if first_image %}
+              <img src="{{ first_image.pet_image.url }}" class="card-img-top" alt="{{ post.pet.name }}">
+            {% else %}
+              <img src="https://via.placeholder.com/400x300" class="card-img-top" alt="{{ post.pet.name }}">
+            {% endif %}
+          {% endwith %}
           <div class="card-body">
-            <h5 class="card-title">{{ pet.name }}</h5>
-            <p class="text-muted mb-1">Submission Time: {{ pet.created_at }}</p>
-            <p class="text-muted mb-1">Review Result Time: {{ pet.review_time|default:'-' }}</p>
-
-            <a href="javascript:void(0);"
-            class="btn btn-orange btn-sm"
-            onclick="confirmDelete({{ pet.pet_id }}, '{{ pet.name }}')">Delete</a>
-
+            <h5 class="card-title">{{ post.pet.name }}</h5>
+            <p class="text-muted mb-1">Submission Time: {{ post.created_at|date:"F j, Y, g:i a" }}</p>
+            <p class="text-muted mb-1">Review Result Time: {{ post.review_time|date:"F j, Y, g:i a" }}</p>
+            <a href="javascript:void(0);" class="btn btn-orange btn-sm" onclick="confirmDelete({{ post.pet.pet_id }}, '{{ post.pet.name }}')">Delete</a>
           </div>
         </div>
       </div>
@@ -195,139 +132,74 @@
       <p>No posts available.</p>
       {% endfor %}
     </div>
+  </div>
 
-  <!-- 🔥 删除确认模态框 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  function confirmDelete(petId, petName) {
-    Swal.fire({
-      title: "Are you sure?",
-      text: `You are about to delete '${petName}'. This action cannot be undone!`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#f9aa33",
-      cancelButtonColor: "#6c757d",
-      confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // 使用 FormData 发送空数据，避免 JSON 格式问题
-        const formData = new FormData();
-        fetch(`/posts/delete_pet/${petId}/`, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": getCookie("csrftoken")
-          },
-          body: formData
-        })
-        .then(response => {
-          if (response.ok) {
-            Swal.fire({
-              title: "Deleted!",
-              text: `'${petName}' has been deleted.`,
-              icon: "success",
-              confirmButtonColor: "#f9aa33"
-            }).then(() => {
-                // ✅ 这里手动清除 Django messages
-                fetch('/clear_messages/', { method: 'GET' }).then(() => {
-                    location.reload();  // 刷新页面，显示删除后的列表
-                });
-            });
-          } else {
-            response.json().then(data => {
-              console.error("Error response:", data);
-            });
+  <!-- 删除确认模态框及相关JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function confirmDelete(petId, petName) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: `You are about to delete '${petName}'. This action cannot be undone!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#f9aa33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, delete it!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const formData = new FormData();
+          fetch(`/posts/delete_pet/${petId}/`, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: formData
+          })
+          .then(response => {
+            if (response.ok) {
+              Swal.fire({
+                title: "Deleted!",
+                text: `'${petName}' has been deleted.`,
+                icon: "success",
+                confirmButtonColor: "#f9aa33"
+              }).then(() => location.reload());
+            } else {
+              Swal.fire({
+                title: "Error!",
+                text: "Something went wrong. Please try again.",
+                icon: "error",
+                confirmButtonColor: "#f9aa33"
+              });
+            }
+          })
+          .catch(error => {
             Swal.fire({
               title: "Error!",
-              text: "Something went wrong. Please try again.",
+              text: "Could not connect to server.",
               icon: "error",
               confirmButtonColor: "#f9aa33"
             });
-          }
-        })
-        .catch(error => {
-          console.error("Fetch error:", error);
-          Swal.fire({
-            title: "Error!",
-            text: "Could not connect to server.",
-            icon: "error",
-            confirmButtonColor: "#f9aa33"
           });
-        });
-      }
-    });
-  }
-
-  // 获取 CSRF 令牌
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + "=")) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
         }
-      }
-    }
-    return cookieValue;
-  }
-</script>
-  </div>
-
-  <!-- Bootstrap JS Bundle -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-  ></script>
-
-  <!-- 测试案例：在非 Django 环境下测试时，解除下面的注释 -->
-  <!--
-  <script>
-    const petList = [
-      {
-        status: 'Approved',
-        image_url: 'https://via.placeholder.com/400x300?text=Buddy',
-        name: 'Buddy',
-        submission_time: '2025-02-28 14:30',
-        review_time: '2025-03-01 10:00'
-      },
-      {
-        status: 'Pending',
-        image_url: 'https://via.placeholder.com/400x300?text=Molly',
-        name: 'Molly',
-        submission_time: '2025-03-01 09:15',
-        review_time: '-'
-      },
-      {
-        status: 'Rejected',
-        image_url: 'https://via.placeholder.com/400x300?text=Max',
-        name: 'Max',
-        submission_time: '2025-03-02 16:45',
-        review_time: '2025-03-03 11:30'
-      },
-      // 添加更多测试数据...
-    ];
-
-    if (!document.body.innerHTML.includes('{%')) {
-      const container = document.querySelector('.row');
-      petList.forEach(pet => {
-        const col = document.createElement('div');
-        col.className = 'col-lg-4 col-md-6 col-sm-12';
-        col.innerHTML = `
-          <div class="card pet-card">
-            <div class="status-badge ${pet.status.toLowerCase()}">${pet.status}</div>
-            <img src="${pet.image_url}" alt="${pet.name}" class="card-img-top">
-            <div class="card-body">
-              <h5 class="card-title">${pet.name}</h5>
-              <p class="text-muted mb-1">Submission Time: ${pet.submission_time}</p>
-              <p class="text-muted mb-1">Review Result Time: ${pet.review_time}</p>
-            </div>
-          </div>
-        `;
-        container.appendChild(col);
       });
     }
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
   </script>
-  -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
