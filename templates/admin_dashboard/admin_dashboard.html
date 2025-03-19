@@ -470,38 +470,81 @@
               <th>Children</th>
               <th>Experience</th>
               <th>Reason</th>
-              <th>Vaccinated</th>
-              <th>Pet Passport</th>
-              <th>Operator</th>
+              <th>Landlord Permission</th>
+              <th>Other Pets</th>
               <th>Submission Time</th>
               <th>Review Time</th>
+              <th>Operator</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody id="adoption-tbody">
+          {% for review in adoption_reviews %}
             <tr>
-              <td>1</td>
-              <td><img src="https://via.placeholder.com/40" alt="User" class="avatar"></td>
-              <td>Bob</td>
-              <td>Luna</td>
-              <td>House</td>
-              <td>Own</td>
-              <td>2</td>
-              <td>No</td>
-              <td>Companionship</td>
-              <td>No</td>
-              <td>D100001</td>
-              <td>OperatorB</td>
-              <td>2025-03-05 09:00</td>
-              <td>2025-03-06 16:30</td>
+              <td>{{ forloop.counter }}</td>
+              <td><img src="{{ review.adopter_username.user_image.url }}" alt="{{ review.adopter_username.username }}" class="avatar"></td>
+              <td>{{ review.adopter_username.username }}</td>
+              <td>{{ review.pet.name }}</td>
+              <td>{{ review.home_type |default:"-" }}</td>
+              <td>{{ review.home_ownership |default:"-"  }}</td>
+              <td>{{ review.has_children |default:"-" }}</td>
+              <td>{{ review.experience_with_pets |default:"-" }}</td>
+              <td>{{ review.reason_for_adoption |default:"-" }}</td>
               <td>
-                <select class="status-select">
-                  <option value="Pending" selected>Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
+                {% if review.has_landlord_permission %}
+                  Yes
+                {% else %}
+                  No
+                {% endif %}
               </td>
+              <td>
+                {% if review.has_other_pets %}
+                  {{ review.has_other_pets }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ review.applied_at|date:"j F Y, g:i A" }}</td>
+              <td>
+                {% if review.review_time %}
+                  {{ review.review_time|date:"j F Y, g:i A" }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                {% if review.operator_username %}
+                  {{ review.operator_username.username }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+
+              <td>
+              {% if review.adopt_review_id %}
+                <form method="POST" action="{% url 'admin_dashboard:update_adoption_status' review.adopt_review_id %}" class="approval-form d-flex flex-column align-items-center">
+                  {% csrf_token %}
+                  <select name="status" class="form-select form-select-sm" style="border-radius: 14px; width: auto;">
+                    <option value="Pending" {% if review.status == "Pending" %}selected{% endif %}>Pending</option>
+                    <option value="Approved" {% if review.status == "Approved" %}selected{% endif %}>Approved</option>
+                    <option value="Rejected" {% if review.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                  </select>
+                  <button type="submit" class="btn btn-orange mt-2" style="border-radius: 999px; padding: 0.3rem 1rem; font-size: 0.85rem;">
+                    Update
+                  </button>
+                </form>
+              {% else %}
+                -
+              {% endif %}
+            </td>
+
+
             </tr>
+            {% empty %}
+          <tr>
+            <td colspan="17" class="text-center">No adoption reviews available.</td>
+          </tr>
+           {% endfor %}
           </tbody>
         </table>
       </div>
@@ -619,6 +662,25 @@
     </div>
   </div>
 
+  <!-- Adoption Review Update Modal -->
+<div class="modal fade" id="adoptionStatusUpdateModal" tabindex="-1" aria-labelledby="adoptionStatusUpdateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Status Updated</h5>
+      </div>
+      <div class="modal-body">
+        The adoption review has been successfully updated.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-orange" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -641,11 +703,18 @@
       });
 
       const messages = document.querySelectorAll('[data-message-tags]');
-      messages.forEach(message => {
-        if (message.getAttribute('data-message-tags').includes("success")) {
-          var statusModal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
-          statusModal.show();
-        }
+    messages.forEach(message => {
+    const messageText = message.textContent.trim().toLowerCase();
+
+    if (messageText.includes("adoption review updated successfully")) {
+      // 触发 Adoption Review 成功弹窗
+      var adoptionModal = new bootstrap.Modal(document.getElementById('adoptionStatusUpdateModal'));
+      adoptionModal.show();
+    } else if (messageText.includes("post review updated successfully")) {
+      // 触发 Post Review 成功弹窗
+      var postModal = new bootstrap.Modal(document.getElementById('statusUpdateModal'));
+      postModal.show();
+    }
       });
     });
   </script>

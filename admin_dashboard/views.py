@@ -7,6 +7,8 @@ from posts.models import PostPetInfo,Pet
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.db.models import Q
+from adoptions.models import AdoptionReview
+from django.utils.timezone import now
 
 def admin_dashboard(request):
     """ 管理员主界面，包含多个管理功能 """
@@ -21,6 +23,12 @@ def admin_dashboard(request):
 
     ## 获取所有待审核的宠物发布信息
     post_list = PostPetInfo.objects.select_related('pet','user').all().order_by('-created_at')
+
+    adoption_reviews = AdoptionReview.objects.prefetch_related(
+        'adopt_info'
+    ).select_related(
+        'pet', 'adopter_username', 'operator_username'
+    ).order_by('-applied_at')
 
     has_results = False  # 标记是否有搜索结果
 
@@ -53,6 +61,7 @@ def admin_dashboard(request):
         "users_list": users_list,
         "pets_list_cats": pets_list_cats,
         "pets_list_dogs": pets_list_dogs,
+        'adoption_reviews': adoption_reviews,
         "post_list": post_list,  # 传递 Post Review 数据
         "tab": tab,  # 传递给前端，避免 JS 误判
     }
@@ -81,6 +90,21 @@ def update_post_status(request, post_id):
     messages.success(request, "Pet status updated successfully.")
     return redirect(reverse('admin_dashboard:admin_dashboard'))
 
+
+@require_POST
+def update_adoption_status(request, review_id):
+    # 注意这里使用 adopt_review_id 而非 id
+    review = get_object_or_404(AdoptionReview, adopt_review_id=review_id)
+    new_status = request.POST.get("status")
+    if new_status in ["Pending", "Approved", "Rejected"]:
+        review.status = new_status
+        review.review_time = timezone.now()  # 记录审核时间
+        review.operator_username = request.user  # 记录当前审核管理员
+        review.save()
+        messages.success(request, "Adoption review updated successfully.")
+    else:
+        messages.error(request, "Invalid status update.")
+    return redirect(reverse('admin_dashboard:admin_dashboard'))
 
 
 
