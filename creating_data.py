@@ -69,7 +69,11 @@ for pet in pet_list:
             'size': random.choice(["Large", "Medium", "Small"]),
             'status': pet["status"],
             'posted_by': user,
+<<<<<<< HEAD
             'type': pet["type"],  # 此处类型设为 'Cat'
+=======
+            'type': pet["type"],
+>>>>>>> 4f6e45149d9c342d2e791e6132cface79cfe14e8
         }
     )
 
