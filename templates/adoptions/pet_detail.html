@@ -42,8 +42,7 @@
   <ul class="list-unstyled">
     <li><strong>Breed:</strong> {{ pet.breed }}</li>
     <li><strong>Age:</strong>
-      {% comment %}例如将年龄小于等于2岁视为 Young，大于2岁视为 Adult{% endcomment %}
-      {% if pet.age|default:0 <= 2 %}Young{% else %}Adult{% endif %}
+      {{ pet.age }}
     </li>
     <li><strong>Sex:</strong> {{ pet.sex }}</li>
     <li><strong>Pet ID:</strong> {{ pet.pet_id }}</li>

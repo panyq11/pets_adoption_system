@@ -29,9 +29,9 @@ def available_pets(request):
 
     if age_category:
         if age_category.lower() == 'young':
-            pets = pets.filter(age__lte=2)
+            pets = pets.filter(age='Young')
         elif age_category.lower() == 'adult':
-            pets = pets.filter(age__gt=2)
+            pets = pets.filter(age='Adult')
 
     if sex:
         pets = pets.filter(sex__iexact=sex)
