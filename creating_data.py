@@ -15,11 +15,13 @@ from adoptions.models import AdoptPetInfo, AdoptionReview
 User = get_user_model()
 
 if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser(
+    admin = User.objects.create_superuser(
         username='admin',
         email='admin@admin.com',
-        password='admin'
+        password='admin',
     )
+    admin.user_type = 'Admin'
+    admin.save()
     print("Superuser created successfully!")
 else:
     print("Superuser already exists.")
