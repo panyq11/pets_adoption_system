@@ -44,7 +44,7 @@ if created:
 pet_list = [{"pet_name":"Lucky", "status": "Available", "type": "Dog", "post_status": "Pending", "has_apply": False},
             {"pet_name":"Diasy", "status": "Available", "type": "Cat", "post_status": "Approved", "has_apply": False},
             {"pet_name":"Lisa", "status": "Available", "type": "Cat", "post_status": "Rejected", "has_apply": False},
-            {"pet_name":"Coco", "status": "Available", "type": "Cat", "post_status": "Approved", "has_apply": True, "adopt_status": "Pending"},
+            {"pet_name":"Coco", "status": "Available", "type": "Cat", "post_status": "Approved", "has_apply": True, "adopt_status": "Rejected"},
             {"pet_name":"Milo", "status": "Adopted", "type": "Cat", "post_status": "Approved", "has_apply": True, "adopt_status": "Approved"},
             {"pet_name":"Luna", "status": "Available", "type": "Dog", "post_status": "Approved", "has_apply": True, "adopt_status": "Rejected"}]
 
@@ -104,8 +104,8 @@ for pet in pet_list:
 
     post_review = PostReview.objects.create(
         pet=pet_instance,
-        username=user,         # 申请人
-        operator_username=reviewer,  # 审核人（管理员）
+        username=user,
+        operator_username=reviewer,
         status=pet["post_status"]
 
     )

@@ -101,6 +101,7 @@ def apply_for_adoption(request, pet_id):
 
             review = AdoptionReview(
                 pet=pet,
+                adopt_info = adopt_info,
                 adopter_username=request.user,
                 operator_username=random_operator,
                 status='Pending'

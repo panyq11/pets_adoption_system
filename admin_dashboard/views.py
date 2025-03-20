@@ -36,7 +36,6 @@ def admin_dashboard(request):
         'pet', 'adopter_username', 'operator_username'
     ).order_by('-applied_at')
 
-
     has_results = False  # 标记是否有搜索结果
 
     if keyword:
