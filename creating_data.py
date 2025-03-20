@@ -32,6 +32,12 @@ user, created = User.objects.get_or_create(
     defaults={'email': 'user@user.com'}
 )
 if created:
+
+    image_path = os.path.join(os.path.dirname(__file__), 'media/test_images/user.jpg')
+
+    with open(image_path, 'rb') as f:
+        user.user_image.save('user.jpg', File(f))
+
     user.set_password("user")
     user.save()
 
